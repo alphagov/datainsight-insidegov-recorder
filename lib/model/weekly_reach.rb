@@ -1,6 +1,7 @@
 require "data_mapper"
 require "datainsight_recorder/base_fields"
 require "datainsight_recorder/time_series"
+require "json"
 
 class WeeklyReach
   include DataMapper::Resource
@@ -9,12 +10,23 @@ class WeeklyReach
 
   property :value, Integer, required: true
 
-  def self.retrieve(start_at, end_at)
-    WeeklyReach.all(
-      :start_at.gte => start_at,
-      :end_at.lte => end_at,
-      :order => [ :start_at.asc ]
-    )
+
+  def self.json_representation
+    all_the_things = WeeklyReach.all
+    {
+      response_info: { status: "ok" },
+      id: "/visitors/weekly",
+      web_url: "",
+      details: {
+        source: all_the_things.map(&:source).uniq,
+        data: all_the_things.map { |each| {
+          :start_at => each.start_at,
+          :end_at => each.end_at,
+          :value => each.value
+        } }
+      },
+      updated_at: all_the_things.map(&:collected_at).max
+    }.to_json
   end
 
   private
@@ -26,4 +38,8 @@ class WeeklyReach
       [false, "Weekly reach value must be a positive integer"]
     end
   end
+
+  protected
+
+
 end
