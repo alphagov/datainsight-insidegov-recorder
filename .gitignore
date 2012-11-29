@@ -1,1 +1,6 @@
 .idea
+.tailor
+log/*.log
+vendor
+.bundle
+spec/reports
