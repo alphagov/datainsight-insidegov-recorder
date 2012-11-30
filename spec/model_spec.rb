@@ -10,38 +10,36 @@ describe "The weekly reach model" do
   end
 
   it "should report missing data" do
-    FactoryGirl.create(:model,
-                       start_at: DateTime.parse("2011-03-28T00:00:00"),
-                       end_at: DateTime.parse("2011-04-03T00:00:00"))
-
-    FactoryGirl.create(:model,
-                       start_at: DateTime.parse("2011-04-11T00:00:00"),
-                       end_at: DateTime.parse("2011-04-17T00:00:00"))
+    visitors =
+      [FactoryGirl.create(:model,
+                          start_at: DateTime.parse("2011-03-28T00:00:00"),
+                          end_at: DateTime.parse("2011-04-03T00:00:00")),
+       FactoryGirl.create(:model,
+                          start_at: DateTime.parse("2011-04-11T00:00:00"),
+                          end_at: DateTime.parse("2011-04-17T00:00:00"))]
 
     Timecop.travel(DateTime.parse("2011-04-19")) do
-      json_response = JSON.parse(WeeklyReach.json_representation, symbolize_names: true)
-      json_response[:details][:data].should have(3).items
+      list = WeeklyReach.add_missing_datapoints(visitors)
+      list.should have(3).items
 
-      data = json_response[:details][:data]
-      data[1][:value].should be_nil
+      list[1][:value].should be_nil
     end
   end
 
   it "should produce the correct range when on a Sunday" do
-    FactoryGirl.create(:model,
-                       start_at: DateTime.parse("2011-03-28T00:00:00"),
-                       end_at: DateTime.parse("2011-04-03T00:00:00"))
-
-    FactoryGirl.create(:model,
-                       start_at: DateTime.parse("2011-04-11T00:00:00"),
-                       end_at: DateTime.parse("2011-04-17T00:00:00"))
+    visitors =
+      [FactoryGirl.create(:model,
+                          start_at: DateTime.parse("2011-03-28T00:00:00"),
+                          end_at: DateTime.parse("2011-04-03T00:00:00")),
+       FactoryGirl.create(:model,
+                          start_at: DateTime.parse("2011-04-11T00:00:00"),
+                          end_at: DateTime.parse("2011-04-17T00:00:00"))]
 
     Timecop.travel(DateTime.parse("2011-04-24")) do
-      json_response = JSON.parse(WeeklyReach.json_representation, symbolize_names: true)
-      json_response[:details][:data].should have(3).items
+      list = WeeklyReach.add_missing_datapoints(visitors)
+      list.should have(3).items
 
-      data = json_response[:details][:data]
-      data[1][:value].should be_nil
+      list[1][:value].should be_nil
     end
   end
 
