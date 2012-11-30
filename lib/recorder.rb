@@ -6,9 +6,7 @@ Bundler.require(:default, :recorder)
 require_relative "model/weekly_reach"
 
 class Recorder
-
   ROUTING_KEYS = ["google_analytics.inside_gov.visitors.weekly"]
-
 
   def run
     queue.subscribe do |msg|

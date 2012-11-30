@@ -21,9 +21,13 @@ describe "The api layer" do
     date_time - (date_time.wday == 0 ? 7 : date_time.wday)
   end
 
+  def last_saturday_of(date_time)
+    date_time - (date_time.wday + 1)
+  end
+
   it "should serve up a json response" do
     start_at ||= last_sunday_of(DateTime.now << 6)
-    end_at ||= last_sunday_of(DateTime.now)
+    end_at ||= last_saturday_of(DateTime.now)
     end_date_of_a_first_week = (DateTime.now << 6) + 7
 
     create_measurements(start_at, end_at, metric: "visitors", value: 500)
@@ -41,7 +45,7 @@ describe "The api layer" do
     json_response[:details][:source].should == ["Google Analytics"]
 
     data = json_response[:details][:data]
-    data.first[:end_at].should == last_sunday_of(end_date_of_a_first_week).to_datetime.strftime
+    data.first[:end_at].should == last_saturday_of(end_date_of_a_first_week).to_date.strftime
     data.first[:value].should == 500
   end
 end
