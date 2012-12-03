@@ -31,6 +31,7 @@ describe "The api layer" do
 
     one_minute = Rational(1, 24*60)
 
+    last_response.content_type.should start_with("application/json")
     json_response = JSON.parse(last_response.body, symbolize_names: true)
     DateTime.parse(json_response[:updated_at]).should be_within(one_minute).of(DateTime.now)
     json_response[:response_info].should == {status: "ok"}
