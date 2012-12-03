@@ -1,6 +1,6 @@
-require_relative "../spec_helper"
-require_relative "../../lib/recorder"
-require_relative "../../lib/model/weekly_reach"
+require_relative "spec_helper"
+require_relative "../lib/recorder"
+require_relative "../lib/model/weekly_reach"
 require "datainsight_recorder/test_helpers"
 
 describe "Recorder" do
