@@ -29,7 +29,7 @@ GEM
       addressable (~> 2.1)
     datainsight_logging (0.0.2)
       logging
-    datainsight_recorder (0.0.3)
+    datainsight_recorder (0.0.4)
       bunny
       data_mapper (= 1.2.0)
       datainsight_logging
@@ -125,7 +125,7 @@ DEPENDENCIES
   airbrake (= 3.1.5)
   bunny
   ci_reporter
-  datainsight_recorder (= 0.0.3)
+  datainsight_recorder (= 0.0.4)
   factory_girl
   gli (= 1.6.0)
   rack-test
