@@ -1,7 +1,7 @@
 require_relative "spec_helper"
-require_relative "../lib/time_series_presenter"
+require_relative "../lib/date_series_presenter"
 
-describe TimeSeriesPresenter do
+describe DateSeriesPresenter do
   it "should report missing data" do
     visitors =
       [FactoryGirl.build(:model,
@@ -12,9 +12,10 @@ describe TimeSeriesPresenter do
                           end_at: DateTime.parse("2011-04-17T00:00:00"))]
 
     Timecop.travel(DateTime.parse("2011-04-19")) do
-      list = TimeSeriesPresenter.new("").add_missing_datapoints(visitors)
+      list = DateSeriesPresenter.new("").add_missing_datapoints(visitors)
       list.should have(3).items
 
+      list[1][:start_at].should == Date.parse("2011-04-04")
       list[1][:value].should be_nil
     end
   end
@@ -29,7 +30,7 @@ describe TimeSeriesPresenter do
                           end_at: DateTime.parse("2011-04-17T00:00:00"))]
 
     Timecop.travel(DateTime.parse("2011-04-24")) do
-      list = TimeSeriesPresenter.new("").add_missing_datapoints(visitors)
+      list = DateSeriesPresenter.new("").add_missing_datapoints(visitors)
       list.should have(3).items
 
       list[1][:value].should be_nil
@@ -38,15 +39,15 @@ describe TimeSeriesPresenter do
 
   describe "last_sunday_of" do
     it "should return the same day if argument is already Sunday" do
-      TimeSeriesPresenter.new("").last_sunday_of(Date.parse("2012-06-13")) == Date.parse("2012-06-13")
+      DateSeriesPresenter.new("").last_sunday_of(Date.parse("2012-06-13")) == Date.parse("2012-06-13")
     end
 
     it "should return the previous Sunday day if argument is Saturday" do
-      TimeSeriesPresenter.new("").last_sunday_of(Date.parse("2012-06-12")) == Date.parse("2012-06-06")
+      DateSeriesPresenter.new("").last_sunday_of(Date.parse("2012-06-12")) == Date.parse("2012-06-06")
     end
 
     it "should return the previous Sunday if argument is Monday" do
-      TimeSeriesPresenter.new("").last_sunday_of(Date.parse("2012-06-07")) == Date.parse("2012-06-06")
+      DateSeriesPresenter.new("").last_sunday_of(Date.parse("2012-06-07")) == Date.parse("2012-06-06")
     end
   end
 end

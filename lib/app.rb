@@ -2,7 +2,7 @@ require "bundler/setup"
 Bundler.require(:default, :exposer)
 
 require_relative "model/weekly_reach"
-require_relative "time_series_presenter"
+require_relative "date_series_presenter"
 require_relative "datamapper_config"
 require_relative "initializers"
 
@@ -20,7 +20,7 @@ configure do
 end
 
 get "/visitors/weekly" do
-  response = TimeSeriesPresenter.new("/visitors/weekly").present(WeeklyReach.all)
+  response = DateSeriesPresenter.new("/visitors/weekly").present(WeeklyReach.all)
 
   [response.is_error? ? 500 : 200, response.to_json]
 end

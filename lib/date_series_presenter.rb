@@ -1,4 +1,4 @@
-class TimeSeriesPresenter
+class DateSeriesPresenter
   class Response
     def initialize(response)
       @response = response
