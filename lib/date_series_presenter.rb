@@ -8,6 +8,10 @@ class DateSeriesPresenter
       @response[:response_info][:status] != "ok"
     end
 
+    def raw
+      @response
+    end
+
     def to_json
       @response.to_json
     end
