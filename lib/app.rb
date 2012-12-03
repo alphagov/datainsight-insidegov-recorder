@@ -19,6 +19,26 @@ configure do
   end
 end
 
+get "/visits/weekly/policies" do
+  content_type :json
+  {
+      response_info: {status: "ok"},
+      details: {
+          data: PolicyVisits.all.map { |pv|
+            {
+                visits: pv.visits,
+                policy: {
+                    title: pv.policy.title,
+                    web_url: "https://www.gov.uk#{pv.policy.slug}",
+                    updated_at: pv.policy.updated_at,
+                    department: pv.policy.department
+                }
+            }
+          }
+      }
+  }.to_json
+end
+
 get "/visitors/weekly" do
   content_type :json
   response = DateSeriesPresenter.new("/visitors/weekly").present(WeeklyReach.all)
