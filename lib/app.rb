@@ -22,10 +22,14 @@ end
 get "/visits/weekly/policies" do
   content_type :json
 
-  response = {
+  the_data = PolicyVisits.top_5
+
+  return 503 unless the_data.length == 5
+
+  {
       response_info: {status: "ok"},
       details: {
-          data: PolicyVisits.top_5.map { |pv|
+          data: the_data.map { |pv|
             {
                 visits: pv.visits,
                 policy: {
@@ -37,9 +41,8 @@ get "/visits/weekly/policies" do
             }
           }
       }
-  }
+  }.to_json
 
-  (response[:details][:data].length == 5) ? response.to_json : 503
 end
 
 get "/visitors/weekly" do

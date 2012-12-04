@@ -111,7 +111,6 @@ describe "The api layer" do
       result = json_response[:details][:data]
 
       result.should have(5).items
-      result.each { |data| p data[:visits] }
       result.all? { |data| data[:visits] >= 600000 }.should be_true
     end
 
