@@ -21,10 +21,11 @@ end
 
 get "/visits/weekly/policies" do
   content_type :json
-  {
+
+  response = {
       response_info: {status: "ok"},
       details: {
-          data: PolicyVisits.all.map { |pv|
+          data: PolicyVisits.top_5.map { |pv|
             {
                 visits: pv.visits,
                 policy: {
@@ -36,7 +37,9 @@ get "/visits/weekly/policies" do
             }
           }
       }
-  }.to_json
+  }
+
+  (response[:details][:data].length == 5) ? response.to_json : 503
 end
 
 get "/visitors/weekly" do

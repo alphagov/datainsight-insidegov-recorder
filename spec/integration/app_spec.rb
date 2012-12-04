@@ -59,7 +59,16 @@ describe "The api layer" do
   end
 
   describe "/visits/weekly/policies" do
+
+    after(:each) do
+      Policy.destroy
+      PolicyVisits.destroy
+      FactoryGirl.reload
+    end
+
     it "should serve up a json response" do
+      4.times { |n| FactoryGirl.create :policy_visits, visits: n }
+
       FactoryGirl.create :policy, slug: "/government/policy/sample-policy", title: "Sample Policy", department: "MOD", updated_at: DateTime.parse("2012-11-19T16:00:07+00:00")
       FactoryGirl.create :policy_visits, visits: 123000, slug: "/government/policy/sample-policy"
 
@@ -71,12 +80,49 @@ describe "The api layer" do
       json_response = JSON.parse(last_response.body, symbolize_names: true)
       json_response[:response_info].should == {status: "ok"}
       json_response[:details][:data].should be_an_instance_of(Array)
-      json_response[:details][:data].should have(1).items
+      json_response[:details][:data].should have(5).items
       json_response[:details][:data][0][:visits].should == 123000
       json_response[:details][:data][0][:policy][:web_url].should == "https://www.gov.uk/government/policy/sample-policy"
       json_response[:details][:data][0][:policy][:title].should == "Sample Policy"
       json_response[:details][:data][0][:policy][:department].should == "MOD"
       json_response[:details][:data][0][:policy][:updated_at].should == "2012-11-19T16:00:07+00:00"
     end
+
+    it "should return a response with five policies" do
+      10.times { FactoryGirl.create :policy_visits }
+
+      get "/visits/weekly/policies"
+
+      last_response.should be_ok
+      last_response.content_type.should start_with("application/json")
+
+      json_response = JSON.parse(last_response.body, symbolize_names: true)
+      result = json_response[:details][:data]
+      result.should be_an_instance_of(Array)
+      result.should have(5).items
+    end
+
+    it "should return the TOP five policies" do
+      10.times { |n| FactoryGirl.create :policy_visits, visits: (n+1)*100000 }
+
+      get "/visits/weekly/policies"
+
+      json_response = JSON.parse(last_response.body, symbolize_names: true)
+      result = json_response[:details][:data]
+
+      result.should have(5).items
+      result.each { |data| p data[:visits] }
+      result.all? { |data| data[:visits] >= 600000 }.should be_true
+    end
+
+    it "should error if there are not five policies to return" do
+      4.times { FactoryGirl.create :policy_visits }
+
+      get "/visits/weekly/policies"
+
+      last_response.status.should == 503
+    end
+
+    it "should deal with the case where there is missing meta-data for the top five policies"
   end
 end
