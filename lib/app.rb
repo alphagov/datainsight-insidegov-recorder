@@ -41,7 +41,7 @@ end
 
 get "/visitors/weekly" do
   content_type :json
-  response = DateSeriesPresenter.new("/visitors/weekly").present(WeeklyReach.all)
+  response = DateSeriesPresenter.weekly("/visitors/weekly").present(WeeklyReach.all)
 
   [response.is_error? ? 500 : 200, response.to_json]
 end
