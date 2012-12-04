@@ -35,12 +35,14 @@ get "/visits/weekly/policies" do
                 policy: {
                     title: pv.policy.title,
                     web_url: "https://www.gov.uk#{pv.policy.slug}",
-                    updated_at: pv.policy.updated_at,
+                    updated_at: pv.policy.collected_at,
                     department: pv.policy.department
                 }
             }
           }
-      }
+      },
+      updated_at: the_data.map { |pv| [pv.collected_at, pv.policy.collected_at] }.flatten.max
+
   }.to_json
 
 end

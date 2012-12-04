@@ -1,7 +1,7 @@
 class PolicyVisits
   include DataMapper::Resource
+  include DataInsight::Recorder::BaseFields
 
-  property :id, Serial
   property :visits, Integer, required: true
   property :slug, String, required: true
 
