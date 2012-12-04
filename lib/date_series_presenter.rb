@@ -18,28 +18,29 @@ class DateSeriesPresenter
   end
 
   def self.daily(id)
-    return new(id, 1, :daily_end_date)
+    return new(id, 1, :daily)
   end
 
   def self.weekly(id)
-    return new(id, 7, :weekly_end_date)
+    return new(id, 7, :weekly)
   end
 
   private_class_method :new
-  def initialize(id, days_to_step, end_date)
+
+  def initialize(id, days_to_step, period)
     @id = id
     @days_to_step = days_to_step
-    @end_date = end_date
+    @period = period
   end
 
   def present(time_series_data)
     if time_series_data.length == 0
       response = {
-        response_info: { status: "error" }
+        response_info: {status: "error"}
       }
     else
       response = {
-        response_info: { status: "ok" },
+        response_info: {status: "ok"},
         id: @id,
         web_url: "",
         details: {
@@ -75,20 +76,18 @@ class DateSeriesPresenter
   private
   def validate_period(start_at, end_at)
     if (end_at - start_at) != @days_to_step
-      raise "Invalid period, expecting #{@days_to_step} but received #{(end_at - start_at).to_f}"
+      raise "Invalid period, expecting #@days_to_step but received #{(end_at - start_at).to_f}"
     end
   end
 
   def end_date_for(today)
-    send(@end_date, today)
+    case @period
+      when :daily
+        today - 1
+      when :weekly
+        last_sunday_of(today) - 6
+      else
+        raise "Invalid period #@period"
+    end
   end
-
-  def daily_end_date(today)
-    today - 1
-  end
-
-  def weekly_end_date(today)
-    last_sunday_of(today) - 6
-  end
-
 end
