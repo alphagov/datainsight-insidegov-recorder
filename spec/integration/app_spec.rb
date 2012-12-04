@@ -28,9 +28,9 @@ describe "The api layer" do
 
     it "should serve up a json response" do
       weeks = 7
-      start_at ||= last_sunday_of(DateTime.now - (24 * weeks))
-      end_at ||= last_saturday_of(DateTime.now)
-      end_date_of_a_first_week = DateTime.now - (23 * weeks)
+      start_at ||= last_sunday_of(Date.today.to_datetime - (24 * weeks))
+      end_at ||= last_saturday_of(Date.today.to_datetime)
+      end_date_of_a_first_week = Date.today.to_datetime - (23 * weeks)
 
       create_measurements(start_at, end_at, metric: "visitors", value: 500)
       get "/visitors/weekly"
@@ -43,7 +43,7 @@ describe "The api layer" do
       json_response[:response_info].should == {status: "ok"}
       json_response[:id].should == "/visitors/weekly"
       json_response[:web_url].should == ""
-      json_response[:details][:data].should have(25).items
+      json_response[:details][:data].should have(24).items
       json_response[:details][:source].should == ["Google Analytics"]
 
       data = json_response[:details][:data]

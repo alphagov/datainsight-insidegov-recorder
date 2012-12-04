@@ -17,8 +17,19 @@ class DateSeriesPresenter
     end
   end
 
-  def initialize(id)
+  def self.daily(id)
+    return new(id, 1, :daily_end_date)
+  end
+
+  def self.weekly(id)
+    return new(id, 7, :weekly_end_date)
+  end
+
+  private_class_method :new
+  def initialize(id, days_to_step, end_date)
     @id = id
+    @days_to_step = days_to_step
+    @end_date = end_date
   end
 
   def present(time_series_data)
@@ -42,18 +53,42 @@ class DateSeriesPresenter
   end
 
   def add_missing_datapoints(time_series_data)
-    lookup = Hash[time_series_data.map { |item| [item.start_at.to_date, item] }]
-    start_at = time_series_data.map(&:start_at).min.to_date
-    (start_at..last_sunday_of(Date.today)).step(7).map { |start_at|
+    lookup = Hash[time_series_data.map { |item| [item.start_at, item] }]
+    start_at = time_series_data.map(&:start_at).min
+    if start_at != start_at.to_date
+      raise "Periods must start at midnight"
+    end
+    (start_at..end_date_for(Date.today)).step(@days_to_step).map do |start_at|
+      validate_period(start_at, lookup[start_at].end_at) if lookup.has_key?(start_at)
       {
-        start_at: start_at,
-        end_at: start_at + 6,
+        start_at: start_at.to_date,
+        end_at: start_at.to_date + @days_to_step - 1,
         value: (lookup[start_at].value if lookup.has_key?(start_at))
       }
-    }
+    end
   end
 
   def last_sunday_of(date)
     date - (date.wday == 0 ? 7 : date.wday)
   end
+
+  private
+  def validate_period(start_at, end_at)
+    if (end_at - start_at) != @days_to_step
+      raise "Invalid period, expecting #{@days_to_step} but received #{(end_at - start_at).to_f}"
+    end
+  end
+
+  def end_date_for(today)
+    send(@end_date, today)
+  end
+
+  def daily_end_date(today)
+    today - 1
+  end
+
+  def weekly_end_date(today)
+    last_sunday_of(today) - 6
+  end
+
 end

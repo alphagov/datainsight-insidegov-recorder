@@ -9,7 +9,7 @@ describe "The weekly reach model" do
     lambda { WeeklyReach.create(value: -200) }.should raise_error
   end
 
-  describe "create_from_message" do
+  describe "update_from_message" do
 
     before(:each) do
       @message = {
