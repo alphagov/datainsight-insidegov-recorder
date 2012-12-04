@@ -122,6 +122,15 @@ describe "The api layer" do
       last_response.status.should == 503
     end
 
-    it "should deal with the case where there is missing meta-data for the top five policies"
+    it "should deal with the case where there is missing meta-data for the top five policies" do
+      3.times { FactoryGirl.create :policy_visits, policy: nil }
+      2.times { FactoryGirl.create :policy_visits }
+
+      get "/visits/weekly/policies"
+
+      last_response.status.should == 503
+
+    end
+
   end
 end

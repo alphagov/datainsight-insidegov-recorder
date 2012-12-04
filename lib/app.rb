@@ -24,7 +24,7 @@ get "/visits/weekly/policies" do
 
   the_data = PolicyVisits.top_5
 
-  return 503 unless the_data.length == 5
+  return 503 unless the_data.length == 5 and the_data.all?(&:has_metadata?)
 
   {
       response_info: {status: "ok"},
