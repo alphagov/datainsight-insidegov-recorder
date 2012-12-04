@@ -57,7 +57,7 @@ class DateSeriesPresenter
     lookup = Hash[time_series_data.map { |item| [item.start_at, item] }]
     start_at = time_series_data.map(&:start_at).min
     if start_at != start_at.to_date
-      raise "Periods must start at midnight"
+      raise "Periods must start at midnight; received #{start_at}."
     end
     (start_at..end_date_for(Date.today)).step(@days_to_step).map do |start_at|
       validate_period(start_at, lookup[start_at].end_at) if lookup.has_key?(start_at)
