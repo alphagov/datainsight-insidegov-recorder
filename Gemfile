@@ -17,6 +17,8 @@ end
 
 group :test do
   gem "rspec"
+  gem "simplecov"
+  gem "simplecov-rcov"
   gem "rack-test"
   gem "ci_reporter"
   gem "factory_girl"

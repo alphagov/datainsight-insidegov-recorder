@@ -1,6 +1,11 @@
 require "rspec"
 require "bundler/setup"
-Bundler.require
+Bundler.require(:default, :test)
+
+SimpleCov.formatter = SimpleCov::Formatter::RcovFormatter
+SimpleCov.start do
+  add_filter "/spec/"
+end
 
 ENV["RACK_ENV"] = "test"
 require "factory_girl"

@@ -4,9 +4,9 @@ require "bundler/setup"
 Bundler.require(:default, :recorder)
 require "datainsight_recorder/recorder"
 
-require_relative "model/weekly_reach"
+require_relative "../model/weekly_reach"
 
-class Recorder
+class WeeklyVisitorsRecorder
   include DataInsight::Recorder::AMQP
 
   def routing_keys
