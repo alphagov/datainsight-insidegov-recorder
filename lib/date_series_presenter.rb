@@ -26,6 +26,7 @@ class DateSeriesPresenter
   end
 
   private_class_method :new
+
   def initialize(id, days_to_step, end_date)
     @id = id
     @days_to_step = days_to_step
@@ -75,7 +76,8 @@ class DateSeriesPresenter
   private
   def validate_period(start_at, end_at)
     if (end_at - start_at) != @days_to_step
-      raise "Invalid period, expecting #{@days_to_step} but received #{(end_at - start_at).to_f}"
+      raise "Invalid period, expecting #{@days_to_step} days difference,
+            but period was: #{{start_at: start_at, end_at: end_at}}"
     end
   end
 
