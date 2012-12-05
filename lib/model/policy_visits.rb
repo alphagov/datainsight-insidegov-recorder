@@ -28,7 +28,7 @@ class PolicyVisits
       logger.info("Update existing record for #{query}")
       policy_visits.visits = message[:payload][:value][:visits]
       policy_visits.slug = message[:payload][:value][:slug]
-      policy_visits.source = message[:envelope][:collector] # to get around migration
+      policy_visits.source = message[:envelope][:collector]
       policy_visits.collected_at = message[:envelope][:collected_at]
       policy_visits.save
     else

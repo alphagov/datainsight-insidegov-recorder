@@ -36,19 +36,6 @@ describe "PolicyVisitsRecorder" do
     item.end_at.should == DateTime.new(2011, 4, 4)
   end
 
-  it "should delete the record when processing a nil drive message" do
-    FactoryGirl.create(:model,
-                       metric: "visits",
-                       start_at: DateTime.parse("2011-03-28T00:00:00"),
-                       end_at: DateTime.parse("2011-04-03T00:00:00"),
-                       value: 700
-    )
-    @message[:payload][:value][:visits] = nil
-    @recorder.update_message(@message)
-
-    PolicyVisits.all.should be_empty
-  end
-
   it "should store weekly data when processing analytics message" do
     @message[:payload][:value][:site] = "insidegov"
     @recorder.update_message(@message)
