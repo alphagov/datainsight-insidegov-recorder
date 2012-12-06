@@ -18,19 +18,11 @@ describe "The api layer" do
       Policy.destroy
     end
 
-    def last_sunday_of(date_time)
-      date_time - (date_time.wday == 0 ? 7 : date_time.wday)
-    end
-
-    def last_saturday_of(date_time)
-      date_time - (date_time.wday + 1)
-    end
-
-    it "should serve up a json response" do
+    it "should return the last 6 months of data" do
       weeks = 7
-      start_at ||= last_sunday_of(Date.today.to_datetime - (24 * weeks))
-      end_at ||= last_saturday_of(Date.today.to_datetime)
-      end_date_of_a_first_week = Date.today.to_datetime - (23 * weeks)
+      weeks_back = 30
+      start_at = DateUtils.sunday_before(Date.today.to_datetime - (weeks_back * weeks))
+      end_at = DateUtils.saturday_before(Date.today.to_datetime)
 
       create_measurements(start_at, end_at, metric: "visitors", value: 500)
       get "/visitors/weekly"
@@ -43,11 +35,12 @@ describe "The api layer" do
       json_response[:response_info].should == {status: "ok"}
       json_response[:id].should == "/visitors/weekly"
       json_response[:web_url].should == ""
-      json_response[:details][:data].should have(24).items
+      json_response[:details][:data].length.should be_within(1).of(26)
       json_response[:details][:source].should == ["Google Analytics"]
 
       data = json_response[:details][:data]
-      data.first[:end_at].should == last_saturday_of(end_date_of_a_first_week).to_date.strftime
+      # start_at of the first element should be within a week of six months ago
+      DateTime.parse(data.first[:start_at]).should be_within(1 * weeks).of(Date.today << 6)
       data.first[:value].should == 500
     end
 

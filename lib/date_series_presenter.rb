@@ -1,3 +1,5 @@
+require_relative "date_utils"
+
 class DateSeriesPresenter
   class Response
     def initialize(response)
@@ -59,18 +61,18 @@ class DateSeriesPresenter
     if start_at != start_at.to_date
       raise "Periods must start at midnight; received #{start_at}."
     end
-    (start_at..end_date_for(Date.today)).step(@days_to_step).map do |start_at|
-      validate_period(start_at, lookup[start_at].end_at) if lookup.has_key?(start_at)
+    (start_at..end_date_for(Date.today)).step(@days_to_step).reject {|start_at|
+      # Do not add null values for the last data point if we're on the same day
+      (Date.today == start_at + @days_to_step) and !lookup.has_key?(start_at)
+    }.map do |start_at|
+      value = lookup[start_at].value if lookup.has_key?(start_at)
+      validate_period(start_at, lookup[start_at].end_at) unless value.nil?
       {
         start_at: start_at.to_date,
         end_at: start_at.to_date + @days_to_step - 1,
-        value: (lookup[start_at].value if lookup.has_key?(start_at))
+        value: value
       }
     end
-  end
-
-  def last_sunday_of(date)
-    date - (date.wday == 0 ? 7 : date.wday)
   end
 
   private
@@ -85,7 +87,7 @@ class DateSeriesPresenter
       when :daily
         today - 1
       when :weekly
-        last_sunday_of(today) - 6
+        DateUtils.last_sunday_for(today) - 6
       else
         raise "Invalid period #@period"
     end
