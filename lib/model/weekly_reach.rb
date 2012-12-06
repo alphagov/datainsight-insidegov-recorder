@@ -29,7 +29,7 @@ class WeeklyReach
     if weekly_visitors
       logger.info("Update existing record for #{query}")
       weekly_visitors.value = message[:payload][:value][metric]
-      weekly_visitors.source = message[:envelope][:collector] # to get around migration
+      weekly_visitors.source = message[:envelope][:collector]
       weekly_visitors.collected_at = message[:envelope][:collected_at]
       weekly_visitors.save
     else
@@ -48,6 +48,12 @@ class WeeklyReach
   def self.validate_message(message, metric)
     raise "No value provided in message payload: #{message.inspect}" unless message[:payload].has_key? :value
     raise "No metric value provided in message payload: #{message.inspect} #{metric}" unless message[:payload][:value].has_key? metric
+  end
+
+  def self.last_six_months
+    WeeklyReach.all(
+      :start_at.gte => DateUtils.last_sunday_for(DateTime.now << 6)
+    )
   end
 
   private
