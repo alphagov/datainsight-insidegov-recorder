@@ -1,4 +1,5 @@
 require_relative "spec_helper"
+require_relative "../lib/date_utils"
 
 describe "The weekly reach model" do
   after(:each) do
@@ -102,5 +103,24 @@ describe "The weekly reach model" do
 
     end
 
+  end
+
+  describe "last_six_months" do
+    before(:each) do
+      WeeklyReach.destroy
+    end
+
+    it "should return the last six months data" do
+      start_at = DateUtils.sunday_before(Date.parse("2012-12-01")) << 8
+      end_at = DateUtils.saturday_before(Date.parse("2012-12-01").to_datetime)
+      create_measurements(start_at, end_at, metric: "visitors", value: 500)
+
+      Timecop.travel(DateTime.parse("2012-12-04")) do
+        data = WeeklyReach.last_six_months
+
+        data[0][:start_at].should == DateTime.parse("2012-06-03")
+        data[-1][:start_at].should == DateTime.parse("2012-11-18")
+      end
+    end
   end
 end
