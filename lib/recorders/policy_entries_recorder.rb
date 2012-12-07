@@ -4,9 +4,9 @@ require "bundler/setup"
 Bundler.require(:default, :recorder)
 require "datainsight_recorder/recorder"
 
-require_relative "../model/policy_visits"
+require_relative "../model/policy_entries"
 
-class PolicyVisitsRecorder
+class PolicyEntriesRecorder
   include DataInsight::Recorder::AMQP
 
   def routing_keys
@@ -14,6 +14,6 @@ class PolicyVisitsRecorder
   end
 
   def update_message(message)
-    PolicyVisits.update_from_message(message)
+    PolicyEntries.update_from_message(message)
   end
 end

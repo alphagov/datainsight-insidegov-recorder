@@ -1,41 +1,41 @@
-class PolicyVisits
+class PolicyEntries
   include DataMapper::Resource
   include DataInsight::Recorder::BaseFields
   include DataInsight::Recorder::TimeSeries
 
-  property :visits, Integer, required: true
+  property :entries, Integer, required: true
   property :slug, String, required: true
 
   has 1, :policy,
       :parent_key => [:slug],
       :child_key => [:slug]
 
-  validates_with_method :visits, method: :is_visits_positive?
+  validates_with_method :entries, method: :is_entries_positive?
 
   def self.top_5
-    PolicyVisits.all(order: [:visits.desc]).take(5)
+    PolicyEntries.all(order: [:entries.desc]).take(5)
   end
 
   def self.update_from_message(message)
-    validate_message(message, :visits)
-    return if message[:payload][:value][:visits].nil?
+    validate_message(message, :entries)
+    return if message[:payload][:value][:entries].nil?
     query = {
       :start_at => DateTime.parse(message[:payload][:start_at]),
       :end_at => DateTime.parse(message[:payload][:end_at])
     }
-    policy_visits = PolicyVisits.first(query)
-    if policy_visits
+    policy_entries = PolicyEntries.first(query)
+    if policy_entries
       logger.info("Update existing record for #{query}")
-      policy_visits.visits = message[:payload][:value][:visits]
-      policy_visits.slug = message[:payload][:value][:slug]
-      policy_visits.source = message[:envelope][:collector]
-      policy_visits.collected_at = message[:envelope][:collected_at]
-      policy_visits.save
+      policy_entries.entries = message[:payload][:value][:entries]
+      policy_entries.slug = message[:payload][:value][:slug]
+      policy_entries.source = message[:envelope][:collector]
+      policy_entries.collected_at = message[:envelope][:collected_at]
+      policy_entries.save
     else
       logger.info("Create new record for #{query}")
-      PolicyVisits.create(
+      PolicyEntries.create(
         :slug => message[:payload][:value][:slug],
-        :visits => message[:payload][:value][:visits],
+        :entries => message[:payload][:value][:entries],
         :start_at => DateTime.parse(message[:payload][:start_at]),
         :end_at => DateTime.parse(message[:payload][:end_at]),
         :collected_at => DateTime.parse(message[:envelope][:collected_at]),
@@ -55,9 +55,9 @@ class PolicyVisits
 
   private
 
-  def is_visits_positive?
-    return [false, "It must be numeric"] unless @visits.is_a?(Numeric)
-    (@visits >= 0) ? true : [false, "It must be greater than or equal to 0"]
+  def is_entries_positive?
+    return [false, "It must be numeric"] unless entries.is_a?(Numeric)
+    (@entries >= 0) ? true : [false, "It must be greater than or equal to 0"]
   end
 
 end

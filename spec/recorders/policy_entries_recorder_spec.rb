@@ -1,8 +1,8 @@
 require_relative "../spec_helper"
-require_relative "../../lib/recorders/policy_visits_recorder"
-require_relative "../../lib/model/policy_visits"
+require_relative "../../lib/recorders/policy_entries_recorder"
+require_relative "../../lib/model/policy_entries"
 
-describe "PolicyVisitsRecorder" do
+describe "PolicyEntriesRecorder" do
   before(:each) do
     @message = {
       :envelope => {
@@ -14,24 +14,24 @@ describe "PolicyVisitsRecorder" do
         :start_at => "2011-03-28T00:00:00",
         :end_at => "2011-04-04T00:00:00",
         :value => {
-          :visits => 700,
+          :entries => 700,
           :slug => "/government/policies/some-policy"
         }
       }
     }
-    @recorder = PolicyVisitsRecorder.new
+    @recorder = PolicyEntriesRecorder.new
   end
 
   after :each do
-    PolicyVisits.destroy
+    PolicyEntries.destroy
   end
 
-  it "should store weekly policy visits when processing drive message" do
+  it "should store weekly policy entries when processing drive message" do
     @recorder.update_message(@message)
 
-    PolicyVisits.all.should_not be_empty
-    item = PolicyVisits.first
-    item.visits.should == 700
+    PolicyEntries.all.should_not be_empty
+    item = PolicyEntries.first
+    item.entries.should == 700
     item.start_at.should == DateTime.new(2011, 3, 28)
     item.end_at.should == DateTime.new(2011, 4, 4)
   end
@@ -40,9 +40,9 @@ describe "PolicyVisitsRecorder" do
     @message[:payload][:value][:site] = "insidegov"
     @recorder.update_message(@message)
 
-    PolicyVisits.all.should_not be_empty
-    item = PolicyVisits.first
-    item.visits.should == 700
+    PolicyEntries.all.should_not be_empty
+    item = PolicyEntries.first
+    item.entries.should == 700
     item.start_at.should == DateTime.new(2011, 3, 28)
     item.end_at.should == DateTime.new(2011, 4, 4)
   end
@@ -51,16 +51,16 @@ describe "PolicyVisitsRecorder" do
     @message[:payload][:start_at] = "2011-08-25T00:00:00"
     @message[:payload][:end_at] = "2011-09-01T00:00:00"
     @recorder.update_message(@message)
-    item = PolicyVisits.first
+    item = PolicyEntries.first
     item.end_at.should == DateTime.new(2011, 9, 1)
   end
 
   it "should update existing measurements" do
     @recorder.update_message(@message)
-    @message[:payload][:value][:visits] = 900
+    @message[:payload][:value][:entries] = 900
     @recorder.update_message(@message)
-    PolicyVisits.all.length.should == 1
-    PolicyVisits.first.visits.should == 900
+    PolicyEntries.all.length.should == 1
+    PolicyEntries.first.entries.should == 900
   end
 
   describe "validation" do
@@ -81,7 +81,7 @@ describe "PolicyVisitsRecorder" do
     end
 
     it "should allow nil as a value" do
-      @message[:payload][:value][:visits] = nil
+      @message[:payload][:value][:entries] = nil
 
       lambda do
         @recorder.update_message(@message)

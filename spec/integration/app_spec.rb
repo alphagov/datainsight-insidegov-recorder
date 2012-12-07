@@ -14,7 +14,7 @@ describe "The api layer" do
 
     after(:each) do
       WeeklyReach.destroy
-      PolicyVisits.destroy
+      PolicyEntries.destroy
       Policy.destroy
     end
 
@@ -51,16 +51,16 @@ describe "The api layer" do
     end
   end
 
-  describe "/visits/weekly/policies" do
+  describe "/entries/weekly/policies" do
 
     after(:each) do
       Policy.destroy
-      PolicyVisits.destroy
+      PolicyEntries.destroy
       FactoryGirl.reload
     end
 
     it "should serve up a json response" do
-      4.times { |n| FactoryGirl.create :policy_visits, visits: n }
+      4.times { |n| FactoryGirl.create :policy_entries, entries: n }
 
       FactoryGirl.create :policy,
                          slug: "/government/policy/sample-policy",
@@ -68,12 +68,12 @@ describe "The api layer" do
                          department: "MOD",
                          collected_at: DateTime.parse("2012-12-20T02:00:00+00:00")
 
-      FactoryGirl.create :policy_visits,
-                         visits: 123000,
+      FactoryGirl.create :policy_entries,
+                         entries: 123000,
                          slug: "/government/policy/sample-policy",
                          collected_at: DateTime.parse("2012-12-20T01:00:00+00:00")
 
-      get "/visits/weekly/policies"
+      get "/entries/weekly/policies"
 
       last_response.should be_ok
       last_response.content_type.should start_with("application/json")
@@ -84,7 +84,7 @@ describe "The api layer" do
 
       json_response[:details][:data].should be_an_instance_of(Array)
       json_response[:details][:data].should have(5).items
-      json_response[:details][:data][0][:visits].should == 123000
+      json_response[:details][:data][0][:entries].should == 123000
       json_response[:details][:data][0][:policy][:web_url].should == "https://www.gov.uk/government/policy/sample-policy"
       json_response[:details][:data][0][:policy][:title].should == "Sample Policy"
       json_response[:details][:data][0][:policy][:department].should == "MOD"
@@ -92,9 +92,9 @@ describe "The api layer" do
     end
 
     it "should return a response with five policies" do
-      10.times { FactoryGirl.create :policy_visits }
+      10.times { FactoryGirl.create :policy_entries }
 
-      get "/visits/weekly/policies"
+      get "/entries/weekly/policies"
 
       last_response.should be_ok
       last_response.content_type.should start_with("application/json")
@@ -106,30 +106,30 @@ describe "The api layer" do
     end
 
     it "should return the TOP five policies" do
-      10.times { |n| FactoryGirl.create :policy_visits, visits: (n+1)*100000 }
+      10.times { |n| FactoryGirl.create :policy_entries, entries: (n+1)*100000 }
 
-      get "/visits/weekly/policies"
+      get "/entries/weekly/policies"
 
       json_response = JSON.parse(last_response.body, symbolize_names: true)
       result = json_response[:details][:data]
 
       result.should have(5).items
-      result.all? { |data| data[:visits] >= 600000 }.should be_true
+      result.all? { |data| data[:entries] >= 600000 }.should be_true
     end
 
     it "should error if there are not five policies to return" do
-      4.times { FactoryGirl.create :policy_visits }
+      4.times { FactoryGirl.create :policy_entries }
 
-      get "/visits/weekly/policies"
+      get "/entries/weekly/policies"
 
       last_response.status.should == 503
     end
 
     it "should deal with the case where there is missing meta-data for the top five policies" do
-      3.times { FactoryGirl.create :policy_visits, policy: nil }
-      2.times { FactoryGirl.create :policy_visits }
+      3.times { FactoryGirl.create :policy_entries, policy: nil }
+      2.times { FactoryGirl.create :policy_entries }
 
-      get "/visits/weekly/policies"
+      get "/entries/weekly/policies"
 
       last_response.status.should == 503
 

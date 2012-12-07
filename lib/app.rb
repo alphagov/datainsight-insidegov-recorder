@@ -19,10 +19,10 @@ configure do
   end
 end
 
-get "/visits/weekly/policies" do
+get "/entries/weekly/policies" do
   content_type :json
 
-  the_data = PolicyVisits.top_5
+  the_data = PolicyEntries.top_5
 
   return 503 unless the_data.length == 5 and the_data.all?(&:has_metadata?)
 
@@ -31,7 +31,7 @@ get "/visits/weekly/policies" do
       details: {
           data: the_data.map { |pv|
             {
-                visits: pv.visits,
+                entries: pv.entries,
                 policy: {
                     title: pv.policy.title,
                     web_url: "https://www.gov.uk#{pv.policy.slug}",
