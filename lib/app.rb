@@ -22,26 +22,26 @@ end
 get "/entries/weekly/policies" do
   content_type :json
 
-  the_data = PolicyEntries.top_5
+  top_five_policies = PolicyEntries.top_5
 
-  return 503 unless the_data.length == 5 and the_data.all?(&:has_metadata?)
+  return 503 unless top_five_policies.length == 5 and top_five_policies.all?(&:has_metadata?)
 
   {
       response_info: {status: "ok"},
       details: {
-          data: the_data.map { |pv|
+          data: top_five_policies.map { |policy_entry|
             {
-                entries: pv.entries,
+                entries: policy_entry.entries,
                 policy: {
-                    title: pv.policy.title,
-                    web_url: "https://www.gov.uk#{pv.policy.slug}",
-                    updated_at: pv.policy.collected_at,
-                    department: pv.policy.department
+                    title: policy_entry.policy.title,
+                    web_url: "https://www.gov.uk#{policy_entry.policy.slug}",
+                    updated_at: policy_entry.policy.collected_at,
+                    department: policy_entry.policy.department
                 }
             }
           }
       },
-      updated_at: the_data.map { |pv| [pv.collected_at, pv.policy.collected_at] }.flatten.max
+      updated_at: top_five_policies.map { |policy_entry| [policy_entry.collected_at, policy_entry.policy.collected_at] }.flatten.max
 
   }.to_json
 
