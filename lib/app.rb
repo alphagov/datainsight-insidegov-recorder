@@ -2,6 +2,7 @@ require "bundler/setup"
 Bundler.require(:default, :exposer)
 
 require_relative "model/weekly_reach"
+require_relative "model/policy_entries"
 require_relative "date_series_presenter"
 require_relative "datamapper_config"
 require_relative "initializers"
@@ -27,21 +28,21 @@ get "/entries/weekly/policies" do
   return 503 unless top_five_policies.length == 5 and top_five_policies.all?(&:has_metadata?)
 
   {
-      response_info: {status: "ok"},
-      details: {
-          data: top_five_policies.map { |policy_entry|
-            {
-                entries: policy_entry.entries,
-                policy: {
-                    title: policy_entry.policy.title,
-                    web_url: "https://www.gov.uk#{policy_entry.policy.slug}",
-                    updated_at: policy_entry.policy.collected_at,
-                    department: policy_entry.policy.department
-                }
-            }
+    response_info: {status: "ok"},
+    details: {
+      data: top_five_policies.map { |policy_entry|
+        {
+          entries: policy_entry.entries,
+          policy: {
+            title: "missing",
+            web_url: "https://www.gov.uk#{policy_entry.policy.slug}",
+            updated_at: "missing",
+            department: "missing"
           }
-      },
-      updated_at: top_five_policies.map { |policy_entry| [policy_entry.collected_at, policy_entry.policy.collected_at] }.flatten.max
+        }
+      }
+    },
+    updated_at: top_five_policies.map { |policy_entry| [policy_entry.collected_at] }.flatten.max
 
   }.to_json
 
@@ -49,8 +50,7 @@ end
 
 get "/visitors/weekly" do
   content_type :json
-  response = DateSeriesPresenter.weekly("/visitors/weekly")
-                                .present(WeeklyReach.last_six_months)
+  response = DateSeriesPresenter.weekly("/visitors/weekly").present(WeeklyReach.last_six_months)
 
   [response.is_error? ? 500 : 200, response.to_json]
 end

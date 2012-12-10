@@ -8,7 +8,7 @@ describe "PolicyEntriesRecorder" do
       :envelope => {
         :collected_at => DateTime.now.strftime,
         :collector    => "Google Analytics",
-        :_routing_key => "google_analytics.insidegov.policy_visits.weekly"
+        :_routing_key => "google_analytics.insidegov.policy_entries.weekly"
       },
       :payload => {
         :start_at => "2011-03-28T00:00:00",

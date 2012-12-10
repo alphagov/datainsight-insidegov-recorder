@@ -80,15 +80,17 @@ describe "The api layer" do
 
       json_response = JSON.parse(last_response.body, symbolize_names: true)
       json_response[:response_info].should == {status: "ok"}
-      json_response[:updated_at].should == "2012-12-20T02:00:00+00:00"
+      json_response[:updated_at].should == "2012-12-20T01:00:00+00:00"
 
       json_response[:details][:data].should be_an_instance_of(Array)
       json_response[:details][:data].should have(5).items
       json_response[:details][:data][0][:entries].should == 123000
       json_response[:details][:data][0][:policy][:web_url].should == "https://www.gov.uk/government/policy/sample-policy"
-      json_response[:details][:data][0][:policy][:title].should == "Sample Policy"
-      json_response[:details][:data][0][:policy][:department].should == "MOD"
-      json_response[:details][:data][0][:policy][:updated_at].should == "2012-12-20T02:00:00+00:00"
+      #json_response[:details][:data][0][:policy][:title].should == "Sample Policy" <-- this needs to be put back when we get policy details
+      json_response[:details][:data][0][:policy][:title].should == "missing"
+      #json_response[:details][:data][0][:policy][:department].should == "MOD"
+      json_response[:details][:data][0][:policy][:department].should == "missing"
+      json_response[:details][:data][0][:policy][:updated_at].should == "missing"
     end
 
     it "should return a response with five policies" do

@@ -10,7 +10,7 @@ class PolicyEntriesRecorder
   include DataInsight::Recorder::AMQP
 
   def routing_keys
-    ["google_analytics.insidegov.policy_visits.weekly"]
+    ["google_analytics.insidegov.policy_entries.weekly"]
   end
 
   def update_message(message)

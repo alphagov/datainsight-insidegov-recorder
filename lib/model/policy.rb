@@ -1,3 +1,6 @@
+require "data_mapper"
+require "datainsight_recorder/base_fields"
+
 class Policy
   include DataMapper::Resource
   include DataInsight::Recorder::BaseFields
