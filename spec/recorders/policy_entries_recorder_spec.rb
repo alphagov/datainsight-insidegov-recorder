@@ -1,5 +1,5 @@
 require_relative "../spec_helper"
-require_relative "../../lib/recorders/policy_entries_recorder"
+require_relative "../../lib/recorders/recorder"
 require_relative "../../lib/model/policy_entries"
 
 describe "PolicyEntriesRecorder" do
@@ -19,7 +19,7 @@ describe "PolicyEntriesRecorder" do
         }
       }
     }
-    @recorder = PolicyEntriesRecorder.new
+    @recorder = Recorder.new
   end
 
   after :each do

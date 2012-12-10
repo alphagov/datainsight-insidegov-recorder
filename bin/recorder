@@ -3,8 +3,7 @@
 require "bundler/setup"
 Bundler.require
 
-require_relative "../lib/recorders/policy_entries_recorder.rb"
-require_relative "../lib/recorders/weekly_visitors_recorder.rb"
+require_relative "../lib/recorders/recorder.rb"
 require_relative "../lib/datamapper_config"
 require_relative "../lib/initializers"
 
@@ -21,10 +20,7 @@ command :run do |c|
     begin
       Datainsight::Logging.configure(:type => :recorder)
       DataMapperConfig.configure
-      threads = []
-      threads << Thread.new { PolicyEntriesRecorder.new.run }
-      threads << Thread.new { WeeklyVisitorsRecorder.new.run }
-      threads.each(&:join)
+      Recorder.new.run
     rescue Exception => e
       Airbrake.notify(e)
       raise e
