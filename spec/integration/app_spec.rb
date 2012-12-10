@@ -63,14 +63,14 @@ describe "The api layer" do
       4.times { |n| FactoryGirl.create :policy_entries, entries: n }
 
       FactoryGirl.create :policy,
-                         slug: "/government/policy/sample-policy",
+                         slug: "sample-policy",
                          title: "Sample Policy",
                          department: "MOD",
                          collected_at: DateTime.parse("2012-12-20T02:00:00+00:00")
 
       FactoryGirl.create :policy_entries,
                          entries: 123000,
-                         slug: "/government/policy/sample-policy",
+                         slug: "sample-policy",
                          collected_at: DateTime.parse("2012-12-20T01:00:00+00:00")
 
       get "/entries/weekly/policies"
@@ -85,7 +85,7 @@ describe "The api layer" do
       json_response[:details][:data].should be_an_instance_of(Array)
       json_response[:details][:data].should have(5).items
       json_response[:details][:data][0][:entries].should == 123000
-      json_response[:details][:data][0][:policy][:web_url].should == "https://www.gov.uk/government/policy/sample-policy"
+      json_response[:details][:data][0][:policy][:web_url].should == "https://www.gov.uk/government/policies/sample-policy"
       #json_response[:details][:data][0][:policy][:title].should == "Sample Policy" <-- this needs to be put back when we get policy details
       json_response[:details][:data][0][:policy][:title].should == "missing"
       #json_response[:details][:data][0][:policy][:department].should == "MOD"
@@ -127,15 +127,7 @@ describe "The api layer" do
       last_response.status.should == 503
     end
 
-    it "should deal with the case where there is missing meta-data for the top five policies" do
-      3.times { FactoryGirl.create :policy_entries, policy: nil }
-      2.times { FactoryGirl.create :policy_entries }
-
-      get "/entries/weekly/policies"
-
-      last_response.status.should == 503
-
-    end
+    it "should deal with the case where there is missing metadata for the top five policies"
 
   end
 end

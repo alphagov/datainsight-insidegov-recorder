@@ -10,7 +10,7 @@ class PolicyEntries
   include DataInsight::Recorder::TimeSeries
 
   property :entries, Integer, required: true
-  property :slug, String, required: true
+  property :slug, Text, required: true
 
   has 1, :policy,
       :parent_key => [:slug],
@@ -27,7 +27,8 @@ class PolicyEntries
     return if message[:payload][:value][:entries].nil?
     query = {
       :start_at => DateTime.parse(message[:payload][:start_at]),
-      :end_at => DateTime.parse(message[:payload][:end_at])
+      :end_at => DateTime.parse(message[:payload][:end_at]),
+      :slug => message[:payload][:value][:slug]
     }
     policy_entries = PolicyEntries.first(query)
     if policy_entries
@@ -35,7 +36,9 @@ class PolicyEntries
       policy_entries.entries = message[:payload][:value][:entries]
       policy_entries.slug = message[:payload][:value][:slug]
       policy_entries.source = message[:envelope][:collector]
-      policy_entries.collected_at = message[:envelope][:collected_at]
+      policy_entries.collected_at = DateTime.parse(message[:envelope][:collected_at])
+      policy_entries.valid?
+      policy_entries.errors.each { |each| p each }
       policy_entries.save
     else
       logger.info("Create new record for #{query}")

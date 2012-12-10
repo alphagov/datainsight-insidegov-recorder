@@ -22,10 +22,9 @@ end
 
 get "/entries/weekly/policies" do
   content_type :json
-
   top_five_policies = PolicyEntries.top_5
 
-  return 503 unless top_five_policies.length == 5 and top_five_policies.all?(&:has_metadata?)
+  return 503 unless top_five_policies.length == 5
 
   {
     response_info: {status: "ok"},
@@ -35,7 +34,7 @@ get "/entries/weekly/policies" do
           entries: policy_entry.entries,
           policy: {
             title: "missing",
-            web_url: "https://www.gov.uk#{policy_entry.policy.slug}",
+            web_url: "https://www.gov.uk/government/policies/#{policy_entry.slug}",
             updated_at: "missing",
             department: "missing"
           }
