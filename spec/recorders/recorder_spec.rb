@@ -6,7 +6,8 @@ describe Recorder do
   it "should listen to the correct topic" do
     should_listen_to_topics(
       "google_analytics.insidegov.policy_entries.weekly",
-      "google_analytics.inside_gov.visitors.weekly"
+      "google_analytics.inside_gov.visitors.weekly",
+      "google_analytics.insidegov.entry_and_success.weekly"
     )
 
     Recorder.new.run
@@ -15,6 +16,7 @@ describe Recorder do
   it "should be able to process messages for registered routing keys" do
     WeeklyReach.should_receive(:update_from_message)
     PolicyEntries.should_receive(:update_from_message)
+    FormatVisits.should_receive(:update_from_message)
 
     recorder = Recorder.new
     recorder.routing_keys.each do |key|

@@ -37,8 +37,6 @@ class PolicyEntries
       policy_entries.slug = message[:payload][:value][:slug]
       policy_entries.source = message[:envelope][:collector]
       policy_entries.collected_at = DateTime.parse(message[:envelope][:collected_at])
-      policy_entries.valid?
-      policy_entries.errors.each { |each| p each }
       policy_entries.save
     else
       logger.info("Create new record for #{query}")

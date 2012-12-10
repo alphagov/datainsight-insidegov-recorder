@@ -3,6 +3,7 @@ Bundler.require(:default, :exposer)
 
 require_relative "model/weekly_reach"
 require_relative "model/policy_entries"
+require_relative "model/format_visits"
 require_relative "date_series_presenter"
 require_relative "datamapper_config"
 require_relative "initializers"
