@@ -10,6 +10,11 @@ class FormatVisits
   property :successes, Integer, required: true
 
 
+  def self.last_week_visits
+    self.all(start_at: max(:start_at))
+  end
+
+
   def self.update_from_message(message)
     validate(message)
 

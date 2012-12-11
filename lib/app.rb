@@ -56,7 +56,7 @@ get "/visitors/weekly" do
 end
 
 get "/format-success/weekly" do
-  format_visits = FormatVisits.all
+  format_visits = FormatVisits.last_week_visits
 
   content_type :json
   {
