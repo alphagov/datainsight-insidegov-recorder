@@ -130,4 +130,28 @@ describe "The api layer" do
     it "should deal with the case where there is missing metadata for the top five policies"
 
   end
+
+  describe "/format-success/weekly" do
+    it "should return format success data for the last week in json format" do
+      FactoryGirl.create( :format_visits, source: "format-data-source", format: "news", entries: 1000, successes: 500 )
+      FactoryGirl.create( :format_visits, source: "format-data-source", format: "policy", entries: 2345, successes: 1489 )
+
+      get "/format-success/weekly"
+
+      last_response.status.should == 200
+      last_response.content_type.should start_with("application/json")
+
+      resource = JSON.parse last_response.body, symbolize_names: true
+
+      resource[:response_info][:status].should == "ok"
+      resource[:details][:source].should == [ "format-data-source" ]
+      resource[:details][:data].should have(2).item
+      resource[:details][:data][0][:format].should == "news"
+      resource[:details][:data][0][:entries].should == 1000
+      resource[:details][:data][0][:percentage_of_success].should == 50.0
+      resource[:details][:data][1][:format].should == "policy"
+      resource[:details][:data][1][:entries].should == 2345
+      resource[:details][:data][1][:percentage_of_success].should be_within(0.0001).of(63.4968)
+    end
+  end
 end

@@ -54,3 +54,22 @@ get "/visitors/weekly" do
 
   [response.is_error? ? 500 : 200, response.to_json]
 end
+
+get "/format-success/weekly" do
+  format_visits = FormatVisits.all
+
+  content_type :json
+  {
+      response_info: {status: "ok"},
+      details: {
+        source: format_visits.map { |fv| fv.source }.uniq,
+        data: format_visits.map { |fv|
+          {
+              format: fv.format,
+              entries: fv.entries,
+              percentage_of_success: fv.successes * 100.0 / fv.entries
+          }
+        }
+      }
+  }.to_json
+end
