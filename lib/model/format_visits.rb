@@ -18,11 +18,6 @@ class FormatVisits
   def self.update_from_message(message)
     validate(message)
 
-    query = {
-        start_at: DateTime.parse(message[:payload][:start_at]),
-        end_at: DateTime.parse(message[:payload][:end_at])
-    }
-
     attributes = {
         format: message[:payload][:value][:format],
         entries: message[:payload][:value][:entries],
@@ -31,6 +26,12 @@ class FormatVisits
         end_at: DateTime.parse(message[:payload][:end_at]),
         collected_at: DateTime.parse(message[:envelope][:collected_at]),
         source: message[:envelope][:collector]
+    }
+
+    query = {
+        start_at: attributes[:start_at],
+        end_at: attributes[:end_at],
+        format: attributes[:format]
     }
 
     fv = FormatVisits.first_or_new(query)

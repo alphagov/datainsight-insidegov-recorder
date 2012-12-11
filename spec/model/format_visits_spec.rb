@@ -2,6 +2,30 @@ require_relative "../spec_helper"
 require_relative "../../lib/model/format_visits"
 require_relative "../../lib/model/invalid_message_error"
 
+def message(data = {})
+  default_message = {
+      envelope: {
+          collected_at: "2011-04-05T12:15:35",
+          collector: "Google Analytics",
+          _routing_key: "google_analytics.insidegov.entry_and_success.weekly"
+      },
+      payload: {
+          start_at: "2011-03-28T00:00:00",
+          end_at: "2011-04-04T00:00:00",
+          value: {
+              site: "insidegov",
+              format: "policy",
+              entries: 4567,
+              successes: 2345
+          }
+      }
+  }
+
+  default_message[:payload][:value].merge! data
+  
+  return default_message
+end
+
 describe FormatVisits do
   before(:each) do
     FormatVisits.destroy
@@ -23,23 +47,7 @@ describe FormatVisits do
 
   describe "update_from_message" do
     before(:each) do
-      @message = {
-          envelope: {
-              collected_at: "2011-04-05T12:15:35",
-              collector: "Google Analytics",
-              _routing_key: "google_analytics.insidegov.entry_and_success.weekly"
-          },
-          payload: {
-              start_at: "2011-03-28T00:00:00",
-              end_at: "2011-04-04T00:00:00",
-              value: {
-                  site: "insidegov",
-                  format: "policy",
-                  entries: 4567,
-                  successes: 2345
-              }
-          }
-      }
+      @message = message
     end
 
     it "should store weekly entries and successes when processing drive message" do
@@ -57,16 +65,9 @@ describe FormatVisits do
       format_visits.first.successes.should == 2345
     end
 
-    it "should update existing measurements" do
-      a_message = @message
-      another_message_for_the_same_period = @message.tap { |m|
-        m[:payload][:value][:entries] = 5000
-        m[:payload][:value][:successes] = 3500
-      }
-
-      FormatVisits.update_from_message a_message
-
-      FormatVisits.update_from_message another_message_for_the_same_period
+    it "should update existing data with the same format and period " do
+      FormatVisits.update_from_message message(entries: 4000, successes: 2600)
+      FormatVisits.update_from_message message(entries: 5000, successes: 3500)
 
       format_visits = FormatVisits.all
 
@@ -74,6 +75,15 @@ describe FormatVisits do
 
       format_visits.first.entries.should == 5000
       format_visits.first.successes.should == 3500
+    end
+
+    it "should not update existing data if the format is different " do
+      FormatVisits.update_from_message message(format: "policy", entries: 4000, successes: 2600)
+      FormatVisits.update_from_message message(format: "news", entries: 3000, successes: 2250)
+
+      format_visits = FormatVisits.all
+
+      format_visits.should have(2).object
     end
 
     describe "validation" do
