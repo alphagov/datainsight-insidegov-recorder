@@ -19,6 +19,13 @@ FactoryGirl.find_definitions
 Datainsight::Logging.configure(:env => :test)
 DataMapperConfig.configure(:test)
 
+RSpec.configure do |config|
+  config.before(:each) do
+    DatabaseCleaner.clean_with(:truncation)
+  end
+end
+
+
 def create_measurements(start_at, end_at, params={})
   while start_at < end_at
     each_end_at = start_at + 7

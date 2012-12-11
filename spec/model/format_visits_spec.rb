@@ -22,15 +22,11 @@ def message(data = {})
   }
 
   default_message[:payload][:value].merge! data
-  
+
   return default_message
 end
 
 describe FormatVisits do
-  before(:each) do
-    FormatVisits.destroy
-  end
-
   describe "last_week_visits" do
     it "should return visits for the last available week" do
       FactoryGirl.create(:format_visits, format: "f1", start_at: DateTime.new(2012, 7, 1), end_at: DateTime.new(2012, 7, 8))

@@ -27,6 +27,7 @@ GEM
       dm-validations (~> 1.2.0)
     data_objects (0.10.10)
       addressable (~> 2.1)
+    database_cleaner (0.8.0)
     datainsight_logging (0.0.2)
       logging
     datainsight_recorder (0.0.4)
@@ -131,6 +132,7 @@ DEPENDENCIES
   airbrake (= 3.1.5)
   bunny
   ci_reporter
+  database_cleaner
   datainsight_recorder (= 0.0.4)
   factory_girl
   gli (= 1.6.0)

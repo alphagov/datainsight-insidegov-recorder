@@ -23,4 +23,5 @@ group :test do
   gem "ci_reporter"
   gem "factory_girl"
   gem "timecop"
+  gem "database_cleaner"
 end

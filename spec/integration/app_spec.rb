@@ -12,12 +12,6 @@ describe "The api layer" do
     before(:each) do
     end
 
-    after(:each) do
-      WeeklyReach.destroy
-      PolicyEntries.destroy
-      Policy.destroy
-    end
-
     it "should return the last 6 months of data" do
       weeks = 7
       weeks_back = 30
@@ -52,12 +46,6 @@ describe "The api layer" do
   end
 
   describe "/entries/weekly/policies" do
-
-    after(:each) do
-      Policy.destroy
-      PolicyEntries.destroy
-      FactoryGirl.reload
-    end
 
     it "should serve up a json response" do
       4.times { |n| FactoryGirl.create :policy_entries, entries: n }
@@ -133,8 +121,8 @@ describe "The api layer" do
 
   describe "/format-success/weekly" do
     it "should return format success data for the last week in json format" do
-      FactoryGirl.create( :format_visits, source: "format-data-source", format: "news",   entries: 1000, successes: 500,  collected_at: DateTime.new(2012, 10, 3, 12, 0, 0) )
-      FactoryGirl.create( :format_visits, source: "format-data-source", format: "policy", entries: 2345, successes: 1489, collected_at: DateTime.new(2012, 10, 3, 13, 0, 0))
+      FactoryGirl.create(:format_visits, source: "format-data-source", format: "news", entries: 1000, successes: 500, collected_at: DateTime.new(2012, 10, 3, 12, 0, 0))
+      FactoryGirl.create(:format_visits, source: "format-data-source", format: "policy", entries: 2345, successes: 1489, collected_at: DateTime.new(2012, 10, 3, 13, 0, 0))
 
       get "/format-success/weekly"
 
@@ -144,7 +132,7 @@ describe "The api layer" do
       resource = JSON.parse last_response.body, symbolize_names: true
 
       resource[:response_info][:status].should == "ok"
-      resource[:details][:source].should == [ "format-data-source" ]
+      resource[:details][:source].should == ["format-data-source"]
       resource[:updated_at].should == "2012-10-03T13:00:00+00:00"
       resource[:details][:data].should have(2).item
       resource[:details][:data][0][:format].should == "news"

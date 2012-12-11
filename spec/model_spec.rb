@@ -2,10 +2,6 @@ require_relative "spec_helper"
 require_relative "../lib/date_utils"
 
 describe "The weekly reach model" do
-  after(:each) do
-    WeeklyReach.destroy
-  end
-
   it "should fail storage if value is negative" do
     lambda { WeeklyReach.create(value: -200) }.should raise_error
   end
@@ -106,10 +102,6 @@ describe "The weekly reach model" do
   end
 
   describe "last_six_months" do
-    before(:each) do
-      WeeklyReach.destroy
-    end
-
     it "should return the last six months data" do
       start_at = DateUtils.sunday_before(Date.parse("2012-12-01")) << 8
       end_at = DateUtils.saturday_before(Date.parse("2012-12-01").to_datetime)

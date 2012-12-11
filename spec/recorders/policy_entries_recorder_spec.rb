@@ -22,10 +22,6 @@ describe "PolicyEntriesRecorder" do
     @recorder = Recorder.new
   end
 
-  after :each do
-    PolicyEntries.destroy
-  end
-
   it "should store weekly policy entries when processing drive message" do
     @recorder.update_message(@message)
 
