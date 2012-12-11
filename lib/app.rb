@@ -5,6 +5,7 @@ require_relative "model/weekly_reach"
 require_relative "model/policy_entries"
 require_relative "model/format_visits"
 require_relative "date_series_presenter"
+require_relative "format_success_presenter"
 require_relative "datamapper_config"
 require_relative "initializers"
 
@@ -57,20 +58,8 @@ end
 
 get "/format-success/weekly" do
   format_visits = FormatVisits.last_week_visits
+  response = FormatSuccessPresenter.new.present(format_visits)
 
   content_type :json
-  {
-      response_info: {status: "ok"},
-      details: {
-        source: format_visits.map { |fv| fv.source }.uniq,
-        data: format_visits.map { |fv|
-          {
-              format: fv.format,
-              entries: fv.entries,
-              percentage_of_success: fv.successes * 100.0 / fv.entries
-          }
-        }
-      },
-      updated_at: format_visits.map { |fv| fv.collected_at }.max.strftime
-  }.to_json
+  response.to_json
 end
