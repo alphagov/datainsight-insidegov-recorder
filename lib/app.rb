@@ -70,6 +70,7 @@ get "/format-success/weekly" do
               percentage_of_success: fv.successes * 100.0 / fv.entries
           }
         }
-      }
+      },
+      updated_at: format_visits.map { |fv| fv.collected_at }.max.strftime
   }.to_json
 end
