@@ -50,9 +50,10 @@ class WeeklyReach
     raise "No metric value provided in message payload: #{message.inspect} #{metric}" unless message[:payload][:value].has_key? metric
   end
 
-  def self.last_six_months
+  def self.last_twelve_weeks
+    _12_weeks = (12 * 7)
     WeeklyReach.all(
-      :start_at.gte => DateUtils.last_sunday_for(DateTime.now << 6)
+      :start_at.gte => DateUtils.last_sunday_for(DateTime.now - _12_weeks)
     )
   end
 

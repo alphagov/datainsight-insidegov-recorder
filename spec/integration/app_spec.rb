@@ -12,30 +12,32 @@ describe "The api layer" do
     before(:each) do
     end
 
-    it "should return the last 6 months of data" do
-      weeks = 7
-      weeks_back = 30
-      start_at = DateUtils.sunday_before(Date.today.to_datetime - (weeks_back * weeks))
-      end_at = DateUtils.saturday_before(Date.today.to_datetime)
+    it "should return the last 12 weeks of data" do
+      Timecop.travel(DateTime.parse("2012-12-13")) do
+        weeks = 7
+        weeks_back = 30
+        start_at = DateUtils.sunday_before(Date.today.to_datetime - (weeks_back * weeks))
+        end_at = DateUtils.saturday_before(Date.today.to_datetime)
+        data_collection_date = DateTime.now
 
-      create_measurements(start_at, end_at, metric: "visitors", value: 500)
-      get "/visitors/weekly"
+        create_measurements(start_at, end_at, metric: "visitors", value: 500, collected_at: data_collection_date)
+        get "/visitors/weekly"
 
-      one_minute = Rational(1, 24*60)
+        one_minute = Rational(1, 24*60)
 
-      last_response.content_type.should start_with("application/json")
-      json_response = JSON.parse(last_response.body, symbolize_names: true)
-      DateTime.parse(json_response[:updated_at]).should be_within(one_minute).of(DateTime.now)
-      json_response[:response_info].should == {status: "ok"}
-      json_response[:id].should == "/visitors/weekly"
-      json_response[:web_url].should == ""
-      json_response[:details][:data].length.should be_within(1).of(26)
-      json_response[:details][:source].should == ["Google Analytics"]
+        last_response.content_type.should start_with("application/json")
+        json_response = JSON.parse(last_response.body, symbolize_names: true)
+        json_response[:updated_at].should == data_collection_date.strftime
+        json_response[:response_info].should == {status: "ok"}
+        json_response[:id].should == "/visitors/weekly"
+        json_response[:web_url].should == ""
+        json_response[:details][:data].length.should == 12
+        json_response[:details][:source].should == ["Google Analytics"]
 
-      data = json_response[:details][:data]
-      # start_at of the first element should be within a week of six months ago
-      DateTime.parse(data.first[:start_at]).should be_within(1 * weeks).of(Date.today << 6)
-      data.first[:value].should == 500
+        data = json_response[:details][:data]
+        data.first[:start_at].should == "2012-09-16" # sunday 12 weeks before today
+        data.first[:value].should == 500
+      end
     end
 
     it "should report error if no data found" do

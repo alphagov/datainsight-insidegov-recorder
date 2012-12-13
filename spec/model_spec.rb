@@ -101,17 +101,17 @@ describe "The weekly reach model" do
 
   end
 
-  describe "last_six_months" do
-    it "should return the last six months data" do
+  describe "last_twelve_weeks" do
+    it "should return the last twelve weeks of data" do
       start_at = DateUtils.sunday_before(Date.parse("2012-12-01")) << 8
       end_at = DateUtils.saturday_before(Date.parse("2012-12-01").to_datetime)
       create_measurements(start_at, end_at, metric: "visitors", value: 500)
 
       Timecop.travel(DateTime.parse("2012-12-04")) do
-        data = WeeklyReach.last_six_months
+        data = WeeklyReach.last_twelve_weeks
 
-        data[0][:start_at].should == DateTime.parse("2012-06-03")
-        data[-1][:start_at].should == DateTime.parse("2012-11-18")
+        data.first[:start_at].should == DateTime.parse("2012-09-09")
+        data.last[:start_at].should == DateTime.parse("2012-11-18")
       end
     end
   end
