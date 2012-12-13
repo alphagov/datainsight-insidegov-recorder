@@ -41,4 +41,22 @@ describe "the policy_entries model" do
     policy_visits_record_with_no_metadata.has_metadata?.should == false
   end
 
+  describe "top" do
+    before(:each) do
+      15.times { |n| FactoryGirl.create :policy_entries, entries: (n+1)*100000 }
+    end
+
+    it "should return the top 5 elements" do
+      top_five = PolicyEntries.top(5)
+
+      top_five.should have(5).items
+    end
+
+    it "should return the top 10 elements" do
+      top_ten = PolicyEntries.top(10)
+
+      top_ten.should have(10).items
+    end
+  end
+
 end

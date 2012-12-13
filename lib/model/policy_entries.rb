@@ -18,8 +18,8 @@ class PolicyEntries
 
   validates_with_method :entries, method: :is_entries_positive?
 
-  def self.top_5
-    PolicyEntries.all(order: [:entries.desc]).take(5)
+  def self.top(n=5)
+    PolicyEntries.all(order: [:entries.desc]).take(n)
   end
 
   def self.update_from_message(message)

@@ -24,14 +24,14 @@ end
 
 get "/entries/weekly/policies" do
   content_type :json
-  top_five_policies = PolicyEntries.top_5
+  top_ten_policies = PolicyEntries.top(10)
 
-  return 503 unless top_five_policies.length == 5
+  return 503 unless top_ten_policies.length == 10
 
   {
     response_info: {status: "ok"},
     details: {
-      data: top_five_policies.map { |policy_entry|
+      data: top_ten_policies.map { |policy_entry|
         {
           entries: policy_entry.entries,
           policy: {
@@ -43,7 +43,7 @@ get "/entries/weekly/policies" do
         }
       }
     },
-    updated_at: top_five_policies.map { |policy_entry| [policy_entry.collected_at] }.flatten.max
+    updated_at: top_ten_policies.map { |policy_entry| [policy_entry.collected_at] }.flatten.max
 
   }.to_json
 

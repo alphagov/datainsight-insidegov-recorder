@@ -50,7 +50,7 @@ describe "The api layer" do
   describe "/entries/weekly/policies" do
 
     it "should serve up a json response" do
-      4.times { |n| FactoryGirl.create :policy_entries, entries: n }
+      9.times { |n| FactoryGirl.create :policy_entries, entries: n }
 
       FactoryGirl.create :policy,
                          slug: "sample-policy",
@@ -73,7 +73,7 @@ describe "The api layer" do
       json_response[:updated_at].should == "2012-12-20T01:00:00+00:00"
 
       json_response[:details][:data].should be_an_instance_of(Array)
-      json_response[:details][:data].should have(5).items
+      json_response[:details][:data].should have(10).items
       json_response[:details][:data][0][:entries].should == 123000
       json_response[:details][:data][0][:policy][:web_url].should == "https://www.gov.uk/government/policies/sample-policy"
       #json_response[:details][:data][0][:policy][:title].should == "Sample Policy" <-- this needs to be put back when we get policy details
@@ -83,7 +83,7 @@ describe "The api layer" do
       json_response[:details][:data][0][:policy][:updated_at].should == "missing"
     end
 
-    it "should return a response with five policies" do
+    it "should return a response with ten policies" do
       10.times { FactoryGirl.create :policy_entries }
 
       get "/entries/weekly/policies"
@@ -94,22 +94,22 @@ describe "The api layer" do
       json_response = JSON.parse(last_response.body, symbolize_names: true)
       result = json_response[:details][:data]
       result.should be_an_instance_of(Array)
-      result.should have(5).items
+      result.should have(10).items
     end
 
-    it "should return the TOP five policies" do
-      10.times { |n| FactoryGirl.create :policy_entries, entries: (n+1)*100000 }
+    it "should return the TOP ten policies" do
+      15.times { |n| FactoryGirl.create :policy_entries, entries: (n+1)*100000 }
 
       get "/entries/weekly/policies"
 
       json_response = JSON.parse(last_response.body, symbolize_names: true)
       result = json_response[:details][:data]
 
-      result.should have(5).items
+      result.should have(10).items
       result.all? { |data| data[:entries] >= 600000 }.should be_true
     end
 
-    it "should error if there are not five policies to return" do
+    it "should error if there are not ten policies to return" do
       4.times { FactoryGirl.create :policy_entries }
 
       get "/entries/weekly/policies"
@@ -117,7 +117,7 @@ describe "The api layer" do
       last_response.status.should == 503
     end
 
-    it "should deal with the case where there is missing metadata for the top five policies"
+    it "should deal with the case where there is missing metadata for the top ten policies"
 
   end
 
