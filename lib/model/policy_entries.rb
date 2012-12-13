@@ -28,14 +28,13 @@ class PolicyEntries
     query = {
       :start_at => DateTime.parse(message[:payload][:start_at]),
       :end_at => DateTime.parse(message[:payload][:end_at]),
-      :slug => message[:payload][:value][:slug]
+      :slug => message[:payload][:value][:slug],
+      :source => message[:envelope][:collector]
     }
     policy_entries = PolicyEntries.first(query)
     if policy_entries
       logger.info("Update existing record for #{query}")
       policy_entries.entries = message[:payload][:value][:entries]
-      policy_entries.slug = message[:payload][:value][:slug]
-      policy_entries.source = message[:envelope][:collector]
       policy_entries.collected_at = DateTime.parse(message[:envelope][:collected_at])
       policy_entries.save
     else
