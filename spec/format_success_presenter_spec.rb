@@ -36,6 +36,15 @@ describe FormatSuccessPresenter do
     response[:updated_at].should == "2012-12-02T12:00:10+00:00"
   end
 
+  it "should report percentage of success as 0 if both entries and successes are 0" do
+    list_of_format_visits = [
+      FactoryGirl.build(:format_visits, entries: 0, successes: 0)
+    ]
+
+    response = FormatSuccessPresenter.new.present(list_of_format_visits)
+    response[:details][:data].first[:percentage_of_success].should == 0
+  end
+
   it "should build an empty response if no visits are available" do
     response = FormatSuccessPresenter.new.present([])
 

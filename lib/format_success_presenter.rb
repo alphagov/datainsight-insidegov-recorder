@@ -12,7 +12,7 @@ class FormatSuccessPresenter
       {
           format: fv.format,
           entries: fv.entries,
-          percentage_of_success: fv.successes * 100.0 / fv.entries
+          percentage_of_success: (fv.entries == 0 ? 0 : fv.successes * 100.0 / fv.entries)
       }
     }
 
