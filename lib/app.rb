@@ -51,7 +51,12 @@ end
 
 get "/visitors/weekly" do
   content_type :json
-  response = DateSeriesPresenter.weekly("/visitors/weekly").present(WeeklyReach.last_twelve_weeks)
+  response = DateSeriesPresenter.weekly("/visitors/weekly")
+                                .present(WeeklyReach.last_six_months)
+
+  unless request[:limit].nil?
+    response.limit(request[:limit].to_i)
+  end
 
   [response.is_error? ? 500 : 200, response.to_json]
 end

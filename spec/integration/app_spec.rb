@@ -12,7 +12,7 @@ describe "The api layer" do
     before(:each) do
     end
 
-    it "should return the last 12 weeks of data" do
+    it "should return the last 6 months of data" do
       Timecop.travel(DateTime.parse("2012-12-13")) do
         weeks = 7
         weeks_back = 30
@@ -31,13 +31,68 @@ describe "The api layer" do
         json_response[:response_info].should == {status: "ok"}
         json_response[:id].should == "/visitors/weekly"
         json_response[:web_url].should == ""
+        json_response[:details][:data].length.should == 26
+        json_response[:details][:source].should == ["Google Analytics"]
+
+        data = json_response[:details][:data]
+        data.first[:start_at].should == "2012-06-10" # sunday 6 months before today
+        data.first[:value].should == 500
+      end
+    end
+
+    it "should be possible to limit the results" do
+      Timecop.travel(DateTime.parse("2012-12-13")) do
+        weeks = 7
+        weeks_back = 30
+        start_at = DateUtils.sunday_before(Date.today.to_datetime - (weeks_back * weeks))
+        end_at = DateUtils.saturday_before(Date.today.to_datetime)
+        data_collection_date = DateTime.now
+
+        create_measurements(start_at, end_at, metric: "visitors", value: 500, collected_at: data_collection_date)
+        get "/visitors/weekly?limit=12"
+
+        one_minute = Rational(1, 24*60)
+
+        last_response.content_type.should start_with("application/json")
+        json_response = JSON.parse(last_response.body, symbolize_names: true)
+        json_response[:updated_at].should == data_collection_date.strftime
+        json_response[:response_info].should == {status: "ok"}
+        json_response[:id].should == "/visitors/weekly"
+        json_response[:web_url].should == ""
         json_response[:details][:data].length.should == 12
         json_response[:details][:source].should == ["Google Analytics"]
 
         data = json_response[:details][:data]
-        data.first[:start_at].should == "2012-09-16" # sunday 12 weeks before today
+        data.first[:start_at].should == "2012-09-16" # sunday 6 months before today
         data.first[:value].should == 500
       end
+    end
+
+    it "should correctly limit the results when there is missing data" do
+      weeks = 7
+      weeks_back = 30
+      start_at = DateUtils.sunday_before(Date.today.to_datetime - (weeks_back * weeks))
+      end_at = DateUtils.saturday_before(Date.today.to_datetime)
+      data_collection_date = DateTime.now
+
+      create_measurements(start_at, end_at - 6 * weeks, metric: "visitors", value: 500, collected_at: data_collection_date)
+      create_measurements(end_at - 3 * weeks + 1, end_at, metric: "visitors", value: 500, collected_at: data_collection_date)
+      get "/visitors/weekly?limit=12"
+
+      one_minute = Rational(1, 24*60)
+
+      last_response.content_type.should start_with("application/json")
+      json_response = JSON.parse(last_response.body, symbolize_names: true)
+      json_response[:updated_at].should == data_collection_date.strftime
+      json_response[:response_info].should == {status: "ok"}
+      json_response[:id].should == "/visitors/weekly"
+      json_response[:web_url].should == ""
+      json_response[:details][:data].length.should == 12
+      json_response[:details][:source].should == ["Google Analytics"]
+
+      data = json_response[:details][:data]
+      data.first[:start_at].should == "2012-09-16" # sunday 6 months before today
+      data.first[:value].should == 500
     end
 
     it "should report error if no data found" do

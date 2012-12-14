@@ -57,6 +57,12 @@ class WeeklyReach
     )
   end
 
+  def self.last_six_months
+    WeeklyReach.all(
+      :start_at.gte => DateUtils.last_sunday_for(DateTime.now << 6)
+    )
+  end
+
   private
 
   def validate_value
