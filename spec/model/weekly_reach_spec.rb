@@ -1,5 +1,5 @@
-require_relative "spec_helper"
-require_relative "../lib/date_utils"
+require_relative "../spec_helper"
+require_relative "../../lib/date_utils"
 
 describe "The weekly reach model" do
   it "should fail storage if value is negative" do
@@ -111,6 +111,21 @@ describe "The weekly reach model" do
         data = WeeklyReach.last_twelve_weeks
 
         data.first[:start_at].should == DateTime.parse("2012-09-09")
+        data.last[:start_at].should == DateTime.parse("2012-11-18")
+      end
+    end
+  end
+
+  describe "last_six_months" do
+    it "should return the last six months of data" do
+      start_at = DateUtils.sunday_before(Date.parse("2012-12-01")) << 8
+      end_at = DateUtils.saturday_before(Date.parse("2012-12-01").to_datetime)
+      create_measurements(start_at, end_at, metric: "visitors", value: 500)
+
+      Timecop.travel(DateTime.parse("2012-12-04")) do
+        data = WeeklyReach.last_six_months
+
+        data.first[:start_at].should == DateTime.parse("2012-06-03")
         data.last[:start_at].should == DateTime.parse("2012-11-18")
       end
     end

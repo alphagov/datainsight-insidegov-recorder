@@ -14,6 +14,11 @@ class DateSeriesPresenter
       @response
     end
 
+    def limit(limit)
+      @response[:details][:data] = @response[:details][:data][0-limit..-1]
+      self
+    end
+
     def to_json
       @response.to_json
     end

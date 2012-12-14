@@ -21,6 +21,27 @@ describe DateSeriesPresenter do
       end
     end
 
+    describe "response object" do
+      it "should be possible to limit the results" do
+        visitors =
+          [FactoryGirl.build(:model,
+                             start_at: DateTime.parse("2012-11-11"),
+                             end_at: DateTime.parse("2012-11-18")),
+           FactoryGirl.build(:model,
+                             start_at: DateTime.parse("2012-11-25"),
+                             end_at: DateTime.parse("2012-12-02"))]
+
+        Timecop.travel(DateTime.parse("2012-12-04")) do
+          list = @presenter.present(visitors)
+          list.raw[:details][:data].should have(3).items
+
+          list = list.limit(2)
+          list.raw[:details][:data].should have(2).items
+        end
+      end
+
+    end
+
     describe "nil values" do
       it "should be inserted for missing data points" do
         visitors =
