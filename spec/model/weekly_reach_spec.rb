@@ -1,5 +1,5 @@
-require_relative "spec_helper"
-require_relative "../lib/date_utils"
+require_relative "../spec_helper"
+require_relative "../../lib/date_utils"
 
 describe "The weekly reach model" do
   it "should fail storage if value is negative" do
