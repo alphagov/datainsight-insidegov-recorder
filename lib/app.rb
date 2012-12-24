@@ -32,13 +32,14 @@ get "/entries/weekly/policies" do
     response_info: {status: "ok"},
     details: {
       data: top_ten_policies.map { |policy_entry|
+        return 503 unless policy_entry.policy
         {
           entries: policy_entry.entries,
           policy: {
-            title: "missing",
+            title: policy_entry.policy.title,
             web_url: "https://www.gov.uk/government/policies/#{policy_entry.slug}",
-            updated_at: "missing",
-            department: "missing"
+            updated_at: policy_entry.policy.policy_updated_at,
+            department: policy_entry.policy.department
           }
         }
       }

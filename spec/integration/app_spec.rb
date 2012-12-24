@@ -9,9 +9,6 @@ describe "The api layer" do
   end
 
   describe "/visitors/weekly" do
-    before(:each) do
-    end
-
     it "should return the last 6 months of data" do
       Timecop.travel(DateTime.parse("2012-12-13")) do
         weeks = 7
@@ -113,6 +110,8 @@ describe "The api layer" do
                          slug: "sample-policy",
                          title: "Sample Policy",
                          department: "MOD",
+                         organisations: '[{"abbreviation":"MOD","name":"Ministry of defence"}]',
+                         policy_updated_at: DateTime.parse("2012-12-19T02:00:00+00:00"),
                          collected_at: DateTime.parse("2012-12-20T02:00:00+00:00")
 
       FactoryGirl.create :policy_entries,
@@ -133,11 +132,24 @@ describe "The api layer" do
       json_response[:details][:data].should have(10).items
       json_response[:details][:data][0][:entries].should == 123000
       json_response[:details][:data][0][:policy][:web_url].should == "https://www.gov.uk/government/policies/sample-policy"
-      #json_response[:details][:data][0][:policy][:title].should == "Sample Policy" <-- this needs to be put back when we get policy details
-      json_response[:details][:data][0][:policy][:title].should == "missing"
-      #json_response[:details][:data][0][:policy][:department].should == "MOD"
-      json_response[:details][:data][0][:policy][:department].should == "missing"
-      json_response[:details][:data][0][:policy][:updated_at].should == "missing"
+      json_response[:details][:data][0][:policy][:title].should == "Sample Policy"
+      json_response[:details][:data][0][:policy][:department].should == "MOD"
+      json_response[:details][:data][0][:policy][:updated_at].should == "2012-12-19T02:00:00+00:00"
+    end
+
+    it "should return a 500 if there is no joined policy" do
+      9.times { |n| FactoryGirl.create :policy_entries, entries: n }
+
+      FactoryGirl.create :policy_entries,
+                         entries: 123000,
+                         slug: "sample-policy",
+                         collected_at: DateTime.parse("2012-12-20T01:00:00+00:00")
+
+      Policy.destroy
+
+      get "/entries/weekly/policies"
+
+      last_response.should_not be_ok
     end
 
     it "should return a response with ten policies" do
