@@ -15,7 +15,8 @@ class Recorder
     [
       "google_analytics.insidegov.entry_and_success.weekly",
       "google_analytics.insidegov.policy_entries.weekly",
-      "google_analytics.inside_gov.visitors.weekly"
+      "google_analytics.inside_gov.visitors.weekly",
+      "inside_gov.policies"
     ]
   end
 
@@ -28,6 +29,8 @@ class Recorder
         PolicyEntries.update_from_message(message)
       when "google_analytics.inside_gov.visitors.weekly"
         WeeklyReach.update_from_message(message)
+      when "inside_gov.policies"
+        Policy.update_from_message(message)
       else
         raise "Unsupported routing key: #{routing_key}"
     end

@@ -7,7 +7,8 @@ describe Recorder do
     should_listen_to_topics(
       "google_analytics.insidegov.policy_entries.weekly",
       "google_analytics.inside_gov.visitors.weekly",
-      "google_analytics.insidegov.entry_and_success.weekly"
+      "google_analytics.insidegov.entry_and_success.weekly",
+      "inside_gov.policies"
     )
 
     Recorder.new.run
@@ -17,6 +18,7 @@ describe Recorder do
     WeeklyReach.should_receive(:update_from_message)
     PolicyEntries.should_receive(:update_from_message)
     FormatVisits.should_receive(:update_from_message)
+    Policy.should_receive(:update_from_message)
 
     recorder = Recorder.new
     recorder.routing_keys.each do |key|
