@@ -8,4 +8,6 @@ class Policy
   property :slug, Text, required: true
   property :title, Text, required: true
   property :department, String, required: true
+  property :organisations, String, required: true
+  property :updated_at, DateTime, required: true
 end
