@@ -11,7 +11,7 @@ describe "policy (metadata) model" do
         },
         :payload => {
           :title         => "Policy title",
-          :url           => "/foo-bar",
+          :url           => "/government/policies/foo-bar",
           :organisations => [{"abbreviation" => "MOD", "name" => "Ministry of defence"}],
           :updated_at    => DateTime.new(2012, 12, 12, 12, 12, 0, 0).strftime
         }
@@ -22,7 +22,7 @@ describe "policy (metadata) model" do
       Policy.all.should have(1).item
 
       policy = Policy.first
-      policy.slug.should == "/foo-bar"
+      policy.slug.should == "foo-bar"
       policy.title.should == "Policy title"
       policy.organisations.should == '[{"abbreviation":"MOD","name":"Ministry of defence"}]'
       policy.source.should == "InsideGov"
@@ -34,7 +34,7 @@ describe "policy (metadata) model" do
     it "should update an existing policy" do
       Policy.create(
         :title => "New title",
-        :slug  => "/foo-bar",
+        :slug  => "foo-bar",
         :organisations => [{"abbreviation" => "NEW", "name" => "Ministry of new"}],
         :policy_updated_at => DateTime.new(2012, 12, 12, 11, 11, 0, 0),
         :collected_at => DateTime.new(2012, 12, 12, 10, 10, 0, 0),
@@ -45,12 +45,21 @@ describe "policy (metadata) model" do
       Policy.all.should have(1).item
 
       policy = Policy.first
-      policy.slug.should == "/foo-bar"
+      policy.slug.should == "foo-bar"
       policy.title.should == "Policy title"
       policy.organisations.should == '[{"abbreviation":"MOD","name":"Ministry of defence"}]'
       policy.source.should == "InsideGov"
       policy.policy_updated_at.should == DateTime.new(2012, 12, 12, 12, 12, 0, 0)
       policy.collected_at.should == DateTime.new(2012 ,12, 12, 11, 11, 0, 0)
+    end
+
+    it "strip the leading '/government/policies' of the slug" do
+      @message[:payload][:url] = "/government/policies/foo-bar"
+
+      Policy.update_from_message(@message)
+
+      policy = Policy.first
+      policy.slug.should == "foo-bar"
     end
 
     describe "failure" do

@@ -32,7 +32,10 @@ get "/entries/weekly/policies" do
     response_info: {status: "ok"},
     details: {
       data: top_ten_policies.map { |policy_entry|
-        return 503 unless policy_entry.policy
+        unless policy_entry.policy
+          logger.error { "No policy for #{policy_entry.slug}"}
+          return 503
+        end
         {
           entries: policy_entry.entries,
           policy: {

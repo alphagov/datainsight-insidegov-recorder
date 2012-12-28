@@ -11,6 +11,7 @@ class Policy
   property :policy_updated_at, DateTime, required: true
 
   def self.update_from_message(message)
+    message[:payload][:url] = message[:payload][:url].gsub(/^\/government\/policies\//, "")
     query = {
       :slug => message[:payload][:url]
     }
