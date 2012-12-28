@@ -109,7 +109,6 @@ describe "The api layer" do
       FactoryGirl.create :policy,
                          slug: "sample-policy",
                          title: "Sample Policy",
-                         department: "MOD",
                          organisations: '[{"abbreviation":"MOD","name":"Ministry of defence"}]',
                          policy_updated_at: DateTime.parse("2012-12-19T02:00:00+00:00"),
                          collected_at: DateTime.parse("2012-12-20T02:00:00+00:00")
@@ -133,7 +132,7 @@ describe "The api layer" do
       json_response[:details][:data][0][:entries].should == 123000
       json_response[:details][:data][0][:policy][:web_url].should == "https://www.gov.uk/government/policies/sample-policy"
       json_response[:details][:data][0][:policy][:title].should == "Sample Policy"
-      json_response[:details][:data][0][:policy][:department].should == "MOD"
+      json_response[:details][:data][0][:policy][:organisations].should == [{abbreviation: "MOD", name: "Ministry of defence"}]
       json_response[:details][:data][0][:policy][:updated_at].should == "2012-12-19T02:00:00+00:00"
     end
 

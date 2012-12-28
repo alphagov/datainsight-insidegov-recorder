@@ -7,7 +7,6 @@ class Policy
 
   property :slug, Text, required: true
   property :title, Text, required: true
-  property :department, Text, required: true
   property :organisations, Text, required: true
   property :policy_updated_at, DateTime, required: true
 
@@ -20,7 +19,6 @@ class Policy
       policy = Policy.new(slug: message[:payload][:url])
     end
     policy.title = message[:payload][:title]
-    policy.department = message[:payload][:department]
     raise if message[:payload][:organisations].nil?
     policy.organisations = message[:payload][:organisations].to_json
     policy.policy_updated_at = DateTime.parse(message[:payload][:updated_at])

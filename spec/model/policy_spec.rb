@@ -12,7 +12,6 @@ describe "policy (metadata) model" do
         :payload => {
           :title         => "Policy title",
           :url           => "/foo-bar",
-          :department    => "Policy department",
           :organisations => [{"abbreviation" => "MOD", "name" => "Ministry of defence"}],
           :updated_at    => DateTime.new(2012, 12, 12, 12, 12, 0, 0).strftime
         }
@@ -25,7 +24,6 @@ describe "policy (metadata) model" do
       policy = Policy.first
       policy.slug.should == "/foo-bar"
       policy.title.should == "Policy title"
-      policy.department.should == "Policy department"
       policy.organisations.should == '[{"abbreviation":"MOD","name":"Ministry of defence"}]'
       policy.source.should == "InsideGov"
       policy.policy_updated_at.should == DateTime.new(2012, 12, 12, 12, 12, 0, 0)
@@ -37,7 +35,6 @@ describe "policy (metadata) model" do
       Policy.create(
         :title => "New title",
         :slug  => "/foo-bar",
-        :department => "New department",
         :organisations => [{"abbreviation" => "NEW", "name" => "Ministry of new"}],
         :policy_updated_at => DateTime.new(2012, 12, 12, 11, 11, 0, 0),
         :collected_at => DateTime.new(2012, 12, 12, 10, 10, 0, 0),
@@ -50,7 +47,6 @@ describe "policy (metadata) model" do
       policy = Policy.first
       policy.slug.should == "/foo-bar"
       policy.title.should == "Policy title"
-      policy.department.should == "Policy department"
       policy.organisations.should == '[{"abbreviation":"MOD","name":"Ministry of defence"}]'
       policy.source.should == "InsideGov"
       policy.policy_updated_at.should == DateTime.new(2012, 12, 12, 12, 12, 0, 0)
@@ -60,12 +56,6 @@ describe "policy (metadata) model" do
     describe "failure" do
       it "should fail if no title is provided" do
         @message[:payload].delete(:title)
-
-        lambda { Policy.update_from_message(@message) }.should raise_error
-      end
-
-      it "should fail if no department is provided" do
-        @message[:payload].delete(:department)
 
         lambda { Policy.update_from_message(@message) }.should raise_error
       end
@@ -95,7 +85,6 @@ describe "policy (metadata) model" do
       it "should reuqire a slug" do
         policy = Policy.new(
                   title: "test",
-                  department: "the department of test",
                   organisations: '[{"abbreviation":"MOD","name":"Ministry of Defence"}]',
                   policy_updated_at: DateTime.parse("2012-11-19T16:00:07+00:00"),
                   collected_at: DateTime.parse("2012-11-19T16:00:07+00:00"))
@@ -107,7 +96,6 @@ describe "policy (metadata) model" do
       it "should require a title" do
         policy = Policy.new(
                   slug: "test",
-                  department: "the department of test",
                   organisations: '[{"abbreviation":"MOD","name":"Ministry of Defence"}]',
                   policy_updated_at: DateTime.parse("2012-11-19T16:00:07+00:00"),
                   collected_at: DateTime.parse("2012-11-19T16:00:07+00:00"))
@@ -116,23 +104,10 @@ describe "policy (metadata) model" do
         policy.errors[:title].first.should == "Title must not be blank"
       end
 
-      it "should require a department" do
-        policy = Policy.new(
-                  slug: "test",
-                  title: "test",
-                  organisations: '[{"abbreviation":"MOD","name":"Ministry of Defence"}]',
-                  policy_updated_at: DateTime.parse("2012-11-19T16:00:07+00:00"),
-                  collected_at: DateTime.parse("2012-11-19T16:00:07+00:00"))
-
-        policy.valid?.should == false
-        policy.errors[:department].first.should == "Department must not be blank"
-      end
-      
       it "should require an organisations" do
         policy = Policy.new(
                   slug: "test",
                   title: "test",
-                  department: "the department of test",
                   policy_updated_at: DateTime.parse("2012-11-19T16:00:07+00:00"),
                   collected_at: DateTime.parse("2012-11-19T16:00:07+00:00"))
 
@@ -144,7 +119,6 @@ describe "policy (metadata) model" do
         policy = Policy.new(
                   slug: "test",
                   title: "test",
-                  department: "the department of test",
                   organisations: '[{"abbreviation":"MOD","name":"Ministry of Defence"}]',
                   collected_at: DateTime.parse("2012-11-19T16:00:07+00:00"))
 
@@ -156,7 +130,6 @@ describe "policy (metadata) model" do
         policy = Policy.new(
                   slug: "test",
                   title: "test",
-                  department: "the department of test",
                   organisations: '[{"abbreviation":"MOD","name":"Ministry of Defence"}]',
                   policy_updated_at: DateTime.parse("2012-11-19T16:00:07+00:00"))
 
@@ -170,7 +143,6 @@ describe "policy (metadata) model" do
       policy = Policy.new(
                 slug: "test",
                 title: "test",
-                department: "the department of test",
                 organisations: '[{"abbreviation":"MOD","name":"Ministry of Defence"}]',
                 policy_updated_at: DateTime.parse("2012-11-19T16:00:07+00:00"),
                 collected_at: "not_a_date_time")
