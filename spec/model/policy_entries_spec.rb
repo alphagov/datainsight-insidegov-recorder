@@ -61,6 +61,45 @@ describe "the policy_entries model" do
     end
   end
 
+  describe "top last available week" do
+    before(:each) do
+      15.times do |n|
+        params = {
+          entries: (n+2) * 1000,
+          start_at: DateTime.new(2012, 12, 16),
+          end_at: DateTime.new(2012, 12, 23)
+        }
+        FactoryGirl.create :policy_entries, params
+      end
+      15.times do |n|
+        params = {
+          entries: (n+1) * 1000,
+          start_at: DateTime.new(2012, 12, 23),
+          end_at: DateTime.new(2012, 12, 30)
+        }
+        FactoryGirl.create :policy_entries, params
+      end
+    end
+
+    it "should return the top 5 elements for last week" do
+      Timecop.travel(DateTime.new(2012, 12, 31, 13, 32)) do
+        top_five = PolicyEntries.top_last_week(5)
+
+        top_five.should have(5).items
+        top_five.first.entries.should == 15000
+        top_five.first.start_at.should == DateTime.new(2012, 12, 23)
+        top_five.first.end_at.should == DateTime.new(2012, 12, 30)
+
+        top_five.last.entries.should == 5000
+        top_five.last.start_at.should == DateTime.new(2012, 12, 23)
+        top_five.last.end_at.should == DateTime.new(2012, 12, 30)
+      end
+    end
+
+    it "should return the top 10 elements for last week" do
+    end
+  end
+
   describe "policy join" do
     before(:each) do
       FactoryGirl.create :policy_entries, slug: "/my-slug"
