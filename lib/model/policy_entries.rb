@@ -22,6 +22,10 @@ class PolicyEntries
     PolicyEntries.all(order: [:entries.desc]).take(n)
   end
 
+  def self.top_last_week(n)
+    PolicyEntries.all(order: [:entries.desc], start_at: PolicyEntries.max(:start_at)).take(n)
+  end
+
   def self.update_from_message(message)
     validate_message(message, :entries)
     return if message[:payload][:value][:entries].nil?
