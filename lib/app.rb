@@ -24,7 +24,7 @@ end
 
 get "/entries/weekly/policies" do
   content_type :json
-  top_ten_policies = PolicyEntries.top(10)
+  top_ten_policies = PolicyEntries.top_last_week(10)
 
   return 503 unless top_ten_policies.length == 10
 

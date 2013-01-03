@@ -165,8 +165,24 @@ describe "The api layer" do
       result.should have(10).items
     end
 
-    it "should return the TOP ten policies" do
-      15.times { |n| FactoryGirl.create :policy_entries, entries: (n+1)*100000 }
+    it "should return the TOP ten policies for last week" do
+      last_sunday = DateUtils.sunday_before(DateTime.now)
+      15.times do |n|
+        params = {
+          entries: (n+2) * 1000,
+          start_at: last_sunday - 14,
+          end_at: last_sunday - 7
+        }
+        FactoryGirl.create :policy_entries, params
+      end
+      15.times do |n|
+        params = {
+          entries: (n+1) * 1000,
+          start_at: last_sunday - 7,
+          end_at: last_sunday
+        }
+        FactoryGirl.create :policy_entries, params
+      end
 
       get "/entries/weekly/policies"
 
@@ -174,7 +190,8 @@ describe "The api layer" do
       result = json_response[:details][:data]
 
       result.should have(10).items
-      result.all? { |data| data[:entries] >= 600000 }.should be_true
+      result.first[:entries].should == 15000
+      result.last[:entries].should == 6000
     end
 
     it "should error if there are not ten policies to return" do
