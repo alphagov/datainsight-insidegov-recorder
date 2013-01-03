@@ -31,6 +31,8 @@ get "/entries/weekly/policies" do
   {
     response_info: {status: "ok"},
     details: {
+      start_at: top_ten_policies.first.start_at.strftime,
+      end_at: top_ten_policies.first.end_at.strftime,
       data: top_ten_policies.map { |policy_entry|
         unless policy_entry.policy
           logger.error { "No policy for #{policy_entry.slug}"}

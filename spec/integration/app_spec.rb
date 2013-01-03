@@ -127,13 +127,18 @@ describe "The api layer" do
       json_response[:response_info].should == {status: "ok"}
       json_response[:updated_at].should == "2012-12-20T01:00:00+00:00"
 
-      json_response[:details][:data].should be_an_instance_of(Array)
-      json_response[:details][:data].should have(10).items
-      json_response[:details][:data][0][:entries].should == 123000
-      json_response[:details][:data][0][:policy][:web_url].should == "https://www.gov.uk/government/policies/sample-policy"
-      json_response[:details][:data][0][:policy][:title].should == "Sample Policy"
-      json_response[:details][:data][0][:policy][:organisations].should == [{abbreviation: "MOD", name: "Ministry of defence"}]
-      json_response[:details][:data][0][:policy][:updated_at].should == "2012-12-19T02:00:00+00:00"
+      details = json_response[:details]
+      details[:start_at].should == "2012-08-06T00:00:00+00:00"
+      details[:end_at].should == "2012-08-13T00:00:00+00:00"
+
+      data = details[:data]
+      data.should be_an_instance_of(Array)
+      data.should have(10).items
+      data[0][:entries].should == 123000
+      data[0][:policy][:web_url].should == "https://www.gov.uk/government/policies/sample-policy"
+      data[0][:policy][:title].should == "Sample Policy"
+      data[0][:policy][:organisations].should == [{abbreviation: "MOD", name: "Ministry of defence"}]
+      data[0][:policy][:updated_at].should == "2012-12-19T02:00:00+00:00"
     end
 
     it "should return a 500 if there is no joined policy" do
@@ -187,7 +192,11 @@ describe "The api layer" do
       get "/entries/weekly/policies"
 
       json_response = JSON.parse(last_response.body, symbolize_names: true)
-      result = json_response[:details][:data]
+      details = json_response[:details]
+      result = details[:data]
+
+      details[:start_at].should == (last_sunday - 7).strftime
+      details[:end_at].should == last_sunday.strftime
 
       result.should have(10).items
       result.first[:entries].should == 15000
