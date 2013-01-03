@@ -11,6 +11,10 @@ require_relative "../../lib/model/weekly_reach"
 class Recorder
   include DataInsight::Recorder::AMQP
 
+  def queue_name
+    "datainsight_insidegov_recorder"
+  end
+
   def routing_keys
     [
       "google_analytics.insidegov.entry_and_success.weekly",
