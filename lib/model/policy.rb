@@ -8,7 +8,7 @@ class Policy
   property :slug, Text, required: true
   property :title, Text, required: true
   property :organisations, Text, required: true
-  property :policy_updated_at, DateTime, required: true
+  property :policy_updated_at, DateTime, required: false
 
   def self.update_from_message(message)
     message[:payload][:url] = message[:payload][:url].gsub(/^\/government\/policies\//, "")
@@ -22,7 +22,7 @@ class Policy
     policy.title = message[:payload][:title]
     raise if message[:payload][:organisations].nil?
     policy.organisations = message[:payload][:organisations].to_json
-    policy.policy_updated_at = DateTime.parse(message[:payload][:updated_at])
+    policy.policy_updated_at = message[:payload][:updated_at].nil? ? nil : DateTime.parse(message[:payload][:updated_at])
     policy.collected_at = DateTime.parse(message[:envelope][:collected_at])
     policy.source = message[:envelope][:collector]
     policy.save

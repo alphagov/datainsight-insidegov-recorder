@@ -62,6 +62,14 @@ describe "policy (metadata) model" do
       policy.slug.should == "foo-bar"
     end
 
+    it "should allow updated_at to not be provided" do
+      @message[:payload].delete(:updated_at)
+
+      Policy.update_from_message(@message)
+
+      Policy.all.should have(1).item
+    end
+
     describe "failure" do
       it "should fail if no title is provided" do
         @message[:payload].delete(:title)
@@ -71,12 +79,6 @@ describe "policy (metadata) model" do
 
       it "should fail if no organisations are provided" do
         @message[:payload].delete(:organisations)
-
-        lambda { Policy.update_from_message(@message) }.should raise_error
-      end
-
-      it "should fail if no updated_at is provided" do
-        @message[:payload].delete(:updated_at)
 
         lambda { Policy.update_from_message(@message) }.should raise_error
       end
@@ -94,6 +96,7 @@ describe "policy (metadata) model" do
       it "should reuqire a slug" do
         policy = Policy.new(
                   title: "test",
+                  source: "source",
                   organisations: '[{"abbreviation":"MOD","name":"Ministry of Defence"}]',
                   policy_updated_at: DateTime.parse("2012-11-19T16:00:07+00:00"),
                   collected_at: DateTime.parse("2012-11-19T16:00:07+00:00"))
@@ -105,6 +108,7 @@ describe "policy (metadata) model" do
       it "should require a title" do
         policy = Policy.new(
                   slug: "test",
+                  source: "source",
                   organisations: '[{"abbreviation":"MOD","name":"Ministry of Defence"}]',
                   policy_updated_at: DateTime.parse("2012-11-19T16:00:07+00:00"),
                   collected_at: DateTime.parse("2012-11-19T16:00:07+00:00"))
@@ -117,6 +121,7 @@ describe "policy (metadata) model" do
         policy = Policy.new(
                   slug: "test",
                   title: "test",
+                  source: "source",
                   policy_updated_at: DateTime.parse("2012-11-19T16:00:07+00:00"),
                   collected_at: DateTime.parse("2012-11-19T16:00:07+00:00"))
 
@@ -124,21 +129,22 @@ describe "policy (metadata) model" do
         policy.errors[:organisations].first.should == "Organisations must not be blank"
       end
 
-      it "should require an policy_updated_at" do
+      it "should require not an policy_updated_at" do
         policy = Policy.new(
                   slug: "test",
                   title: "test",
+                  source: "source",
                   organisations: '[{"abbreviation":"MOD","name":"Ministry of Defence"}]',
                   collected_at: DateTime.parse("2012-11-19T16:00:07+00:00"))
 
-        policy.valid?.should == false
-        policy.errors[:policy_updated_at].first.should == "Policy updated at must not be blank"
+        policy.valid?.should == true
       end
 
       it "should require a collected_at" do
         policy = Policy.new(
                   slug: "test",
                   title: "test",
+                  source: "source",
                   organisations: '[{"abbreviation":"MOD","name":"Ministry of Defence"}]',
                   policy_updated_at: DateTime.parse("2012-11-19T16:00:07+00:00"))
 
@@ -148,10 +154,24 @@ describe "policy (metadata) model" do
 
     end
 
+    it "should require a source" do
+        policy = Policy.new(
+                  slug: "test",
+                  title: "test",
+                  organisations: '[{"abbreviation":"MOD","name":"Ministry of Defence"}]',
+                  policy_updated_at: DateTime.parse("2012-11-19T16:00:07+00:00"),
+                  collected_at: DateTime.parse("2012-11-19T16:00:07+00:00"))
+
+        policy.valid?.should == false
+        policy.errors[:source].first.should == "Source must not be blank"
+
+    end
+
     it "should validate policy_updated_at correctly (must be DateTime)" do
       policy = Policy.new(
                 slug: "test",
                 title: "test",
+                source: "source",
                 organisations: '[{"abbreviation":"MOD","name":"Ministry of Defence"}]',
                 policy_updated_at: DateTime.parse("2012-11-19T16:00:07+00:00"),
                 collected_at: "not_a_date_time")
