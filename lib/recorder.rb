@@ -4,9 +4,9 @@ require "bundler/setup"
 Bundler.require(:default, :recorder)
 require "datainsight_recorder/recorder"
 
-require_relative "../model/policy_entries"
-require_relative "../model/format_visits"
-require_relative "../../lib/model/weekly_reach"
+require_relative "model/policy_entries"
+require_relative "model/format_visits"
+require_relative "model/weekly_reach"
 
 class Recorder
   include DataInsight::Recorder::AMQP

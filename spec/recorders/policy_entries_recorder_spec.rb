@@ -1,5 +1,5 @@
 require_relative "../spec_helper"
-require_relative "../../lib/recorders/recorder"
+require_relative "../../lib/recorder"
 require_relative "../../lib/model/policy_entries"
 
 describe "PolicyEntriesRecorder" do
