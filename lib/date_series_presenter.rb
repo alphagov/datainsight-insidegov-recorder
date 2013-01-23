@@ -15,7 +15,9 @@ class DateSeriesPresenter
     end
 
     def limit(limit)
-      @response[:details][:data] = @response[:details][:data][0-limit..-1]
+      if limit < @response[:details][:data].length
+        @response[:details][:data] = @response[:details][:data][0-limit..-1]
+      end
       self
     end
 
@@ -66,7 +68,7 @@ class DateSeriesPresenter
     if start_at != start_at.to_date
       raise "Periods must start at midnight; received #{start_at}."
     end
-    (start_at..end_date_for(Date.today)).step(@days_to_step).reject {|start_at|
+    (start_at..end_date_for(Date.today)).step(@days_to_step).reject { |start_at|
       # Do not add null values for the last data point if we're on the same day
       (Date.today == start_at + @days_to_step) and !lookup.has_key?(start_at)
     }.map do |start_at|

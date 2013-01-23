@@ -20,8 +20,6 @@ describe "The api layer" do
         create_measurements(start_at, end_at, metric: "visitors", value: 500, collected_at: data_collection_date)
         get "/visitors/weekly"
 
-        one_minute = Rational(1, 24*60)
-
         last_response.content_type.should start_with("application/json")
         json_response = JSON.parse(last_response.body, symbolize_names: true)
         json_response[:updated_at].should == data_collection_date.strftime
@@ -48,8 +46,6 @@ describe "The api layer" do
         create_measurements(start_at, end_at, metric: "visitors", value: 500, collected_at: data_collection_date)
         get "/visitors/weekly?limit=12"
 
-        one_minute = Rational(1, 24*60)
-
         last_response.content_type.should start_with("application/json")
         json_response = JSON.parse(last_response.body, symbolize_names: true)
         json_response[:updated_at].should == data_collection_date.strftime
@@ -65,6 +61,23 @@ describe "The api layer" do
       end
     end
 
+    it "should cap requests to 6 months" do
+      Timecop.travel(DateTime.parse("2012-12-13")) do
+        weeks = 7
+        weeks_back = 30
+        start_at = DateUtils.sunday_before(Date.today.to_datetime - (weeks_back * weeks))
+        end_at = DateUtils.saturday_before(Date.today.to_datetime)
+        data_collection_date = DateTime.now
+
+        create_measurements(start_at, end_at, metric: "visitors", value: 500, collected_at: data_collection_date)
+        get "/visitors/weekly?limit=30"
+
+        json_response = JSON.parse(last_response.body, symbolize_names: true)
+        json_response[:details][:data].length.should == 26
+
+      end
+    end
+
     it "should correctly limit the results when there is missing data" do
       Timecop.travel(DateTime.parse("2012-12-13")) do
         weeks = 7
@@ -76,8 +89,6 @@ describe "The api layer" do
         create_measurements(start_at, end_at - 6 * weeks, metric: "visitors", value: 500, collected_at: data_collection_date)
         create_measurements(end_at - 3 * weeks + 1, end_at, metric: "visitors", value: 500, collected_at: data_collection_date)
         get "/visitors/weekly?limit=12"
-
-        one_minute = Rational(1, 24*60)
 
         last_response.content_type.should start_with("application/json")
         json_response = JSON.parse(last_response.body, symbolize_names: true)
