@@ -222,8 +222,6 @@ describe "The api layer" do
       last_response.status.should == 503
     end
 
-    it "should deal with the case where there is missing metadata for the top ten policies"
-
   end
 
   describe "/format-success/weekly" do

@@ -18,12 +18,8 @@ class PolicyEntries
 
   validates_with_method :entries, method: :is_entries_positive?
 
-  def self.top(n=5)
-    PolicyEntries.all(order: [:entries.desc]).take(n)
-  end
-
   def self.top_last_week(n)
-    PolicyEntries.all(order: [:entries.desc], start_at: PolicyEntries.max(:start_at), slug: Policy.all(:fields => [:slug]).map(&:slug), limit: n)
+    PolicyEntries.all(order: [:entries.desc], start_at: PolicyEntries.max(:start_at), PolicyEntries.policy.disabled => false, limit: n)
   end
 
   def self.update_from_message(message)

@@ -43,24 +43,6 @@ describe "the policy_entries model" do
     end
   end
 
-  describe "top" do
-    before(:each) do
-      15.times { |n| FactoryGirl.create :policy_entries, entries: (n+1)*100000 }
-    end
-
-    it "should return the top 5 elements" do
-      top_five = PolicyEntries.top(5)
-
-      top_five.should have(5).items
-    end
-
-    it "should return the top 10 elements" do
-      top_ten = PolicyEntries.top(10)
-
-      top_ten.should have(10).items
-    end
-  end
-
   describe "top last available week" do
     before(:each) do
       15.times do |n|
@@ -86,6 +68,15 @@ describe "the policy_entries model" do
       Timecop.travel(DateTime.new(2012, 12, 31, 13, 32)) do
         top_five = PolicyEntries.top_last_week(5)
         top_five.should have(0).items
+      end
+    end
+
+    it "should not return policy entries if the corresponding policy is disabled" do
+      entry = PolicyEntries.top_last_week(5).first
+      entry.policy.update(disabled: true)
+      Timecop.travel(DateTime.new(2012, 12, 31, 13, 32)) do
+        top_five = PolicyEntries.top_last_week(5)
+        top_five.should_not include entry
       end
     end
 
@@ -153,5 +144,6 @@ describe "the policy_entries model" do
       policy_entries = PolicyEntries.first
       policy_entries.policy.should be_nil
     end
+
   end
 end

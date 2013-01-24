@@ -9,6 +9,7 @@ class Policy
   property :title, Text, required: true
   property :organisations, Text, required: true
   property :policy_updated_at, DateTime, required: false
+  property :disabled, Boolean, required: true, default: false
 
   def self.update_from_message(message)
     message[:payload][:url] = message[:payload][:url].gsub(/^\/government\/policies\//, "")
