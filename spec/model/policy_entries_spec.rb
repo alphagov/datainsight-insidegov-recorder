@@ -81,6 +81,14 @@ describe "the policy_entries model" do
       end
     end
 
+    it "should not return policy entries if there is no corresponding policy" do
+      Policy.all.destroy
+      Timecop.travel(DateTime.new(2012, 12, 31, 13, 32)) do
+        top_five = PolicyEntries.top_last_week(5)
+        top_five.should have(0).items
+      end
+    end
+
     it "should return the top 5 elements for last week" do
       Timecop.travel(DateTime.new(2012, 12, 31, 13, 32)) do
         top_five = PolicyEntries.top_last_week(5)

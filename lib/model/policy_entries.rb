@@ -23,7 +23,7 @@ class PolicyEntries
   end
 
   def self.top_last_week(n)
-    PolicyEntries.all(order: [:entries.desc], start_at: PolicyEntries.max(:start_at)).take(n)
+    PolicyEntries.all(order: [:entries.desc], start_at: PolicyEntries.max(:start_at), slug: Policy.all(:fields => [:slug]).map(&:slug), limit: n)
   end
 
   def self.update_from_message(message)
