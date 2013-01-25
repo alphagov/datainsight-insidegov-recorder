@@ -1,4 +1,5 @@
 require 'rubygems'
+require_relative 'lib/model/policy'
 
 unless [ENV["RACK_ENV"], ENV["RAILS_ENV"]].include? "production"
   require 'rspec/core/rake_task'
@@ -12,7 +13,7 @@ end
 
 require_relative "lib/datamapper_config"
 
-task :environment do
+task :init_data_mapper do
   DataMapperConfig.configure
 end
 
@@ -26,11 +27,18 @@ namespace :db do
     end
   end
 
-  task :load_migrations => :environment do
+  task :load_migrations => :init_data_mapper do
     require 'dm-migrations/migration_runner'
     FileList['db/migrate/*.rb'].each do |migration|
       load migration
     end
+  end
+
+  desc "Disable policy by slug"
+  task :disable_policy, [:slug] => :init_data_mapper do |t, args|
+    policy = Policy.first(slug: args[:slug])
+    fail("No policy with slug: #{args[:slug]}") if policy.nil?
+    policy.update(disabled: true)
   end
 end
 
