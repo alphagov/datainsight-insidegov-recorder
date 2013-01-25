@@ -53,6 +53,17 @@ describe "policy (metadata) model" do
       policy.collected_at.should == DateTime.new(2012 ,12, 12, 11, 11, 0, 0)
     end
 
+    it "should re-enable policies on update" do
+      slug = "test-policy"
+      FactoryGirl.create(:policy, slug: slug, disabled: true)
+
+      @message[:payload][:url] = "/government/policies/#{slug}"
+
+      Policy.update_from_message(@message)
+
+      Policy.first(slug: slug).disabled.should == false
+    end
+
     it "strip the leading '/government/policies' of the slug" do
       @message[:payload][:url] = "/government/policies/foo-bar"
 
@@ -93,7 +104,7 @@ describe "policy (metadata) model" do
 
   describe "validation" do
     describe "required fields" do
-      it "should reuqire a slug" do
+      it "should require a slug" do
         policy = Policy.new(
                   title: "test",
                   source: "source",
@@ -179,5 +190,6 @@ describe "policy (metadata) model" do
       policy.valid?.should == false
       policy.errors[:collected_at].first.should == "Collected at must be of type DateTime"
     end
+
   end
 end

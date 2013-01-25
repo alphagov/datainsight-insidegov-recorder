@@ -26,6 +26,7 @@ class Policy
     policy.policy_updated_at = message[:payload][:updated_at].nil? ? nil : DateTime.parse(message[:payload][:updated_at])
     policy.collected_at = DateTime.parse(message[:envelope][:collected_at])
     policy.source = message[:envelope][:collector]
+    policy.disabled = false
     policy.save
   end
 end
