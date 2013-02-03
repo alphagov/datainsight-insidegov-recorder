@@ -25,6 +25,7 @@ class PolicyEntries
   def self.update_from_message(message)
     validate_message(message, :entries)
     return if message[:payload][:value][:entries].nil?
+    message[:payload][:value][:slug] = message[:payload][:value][:slug].downcase
     query = {
       :start_at => DateTime.parse(message[:payload][:start_at]),
       :end_at => DateTime.parse(message[:payload][:end_at]),
@@ -34,6 +35,7 @@ class PolicyEntries
     policy_entries = PolicyEntries.first(query)
     if policy_entries
       logger.info("Update existing record for #{query}")
+      policy_entries.slug = message[:payload][:value][:slug]
       policy_entries.entries = message[:payload][:value][:entries]
       policy_entries.collected_at = DateTime.parse(message[:envelope][:collected_at])
       policy_entries.save
