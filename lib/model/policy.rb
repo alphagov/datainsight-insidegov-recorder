@@ -12,7 +12,10 @@ class Policy
   property :disabled, Boolean, required: true, default: false
 
   def self.update_from_message(message)
-    message[:payload][:url] = message[:payload][:url].gsub(/^\/government\/policies\//, "")
+    message[:payload][:url] = message[:payload][:url]
+      .downcase
+      .gsub(/^\/government\/policies\//, "")
+
     query = {
       :slug => message[:payload][:url]
     }
