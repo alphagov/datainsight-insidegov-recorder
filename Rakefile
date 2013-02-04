@@ -18,14 +18,26 @@ task :init_data_mapper do
 end
 
 namespace :db do
-  desc "Run all pending migrations, or up to specified migration"
-  task :migrate, [:version] => :load_migrations do |t, args|
-    if version = args[:version] || ENV['VERSION']
-      migrate_up!(version)
-    else
-      migrate_up!
+  namespace :migrate do
+    desc "Run all pending migrations, or up to specified migration"
+    task :up, [:version] => :load_migrations do |t, args|
+      if version = args[:version] || ENV['VERSION']
+        migrate_up!(version)
+      else
+        migrate_up!
+      end
+    end
+
+    desc "Roll back all migrations, or down to specified migration"
+    task :down, [:version] => :load_migrations do |t, args|
+      if version = args[:version] || ENV['VERSION']
+        migrate_down!(version)
+      else
+        migrate_down!
+      end
     end
   end
+  task :migrate => "migrate:up"
 
   task :load_migrations => :init_data_mapper do
     require 'dm-migrations/migration_runner'
