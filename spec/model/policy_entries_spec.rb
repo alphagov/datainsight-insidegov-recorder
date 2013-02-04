@@ -146,4 +146,79 @@ describe "the policy_entries model" do
     end
 
   end
+
+  describe "update from message" do
+    before(:each) do
+      @message = {
+        :envelope => {
+          :collected_at => DateTime.now.strftime,
+          :collector    => "Google Analytics",
+          :_routing_key => "google_analytics.insidegov.policy_entries.weekly"
+        },
+        :payload => {
+          :start_at => "2011-03-28T00:00:00",
+          :end_at => "2011-04-04T00:00:00",
+          :value => {
+            :entries => 700,
+            :slug => "/government/policies/some-policy"
+          }
+        }
+      }
+    end
+
+    it "should save a new policy_entries record" do
+      PolicyEntries.update_from_message(@message)
+
+      PolicyEntries.count.should == 1
+      item = PolicyEntries.first
+      item.entries.should == 700
+      item.start_at.should == DateTime.new(2011, 3, 28)
+      item.end_at.should == DateTime.new(2011, 4, 4)
+    end
+
+    it "should update an existing policy_entries record" do
+      record = PolicyEntries.new(
+        collected_at: DateTime.now,
+        source: "Google Analytics",
+        start_at: DateTime.new(2011, 3, 28),
+        end_at: DateTime.new(2011, 4, 4),
+        entries: 700,
+        slug: "/government/policies/some-policy"
+      )
+      record.save
+
+      @message[:payload][:value][:entries] = 800
+      PolicyEntries.update_from_message(@message)
+
+      PolicyEntries.count.should == 1
+      item = PolicyEntries.first
+      item.entries.should == 800
+      item.start_at.should == DateTime.new(2011, 3, 28)
+      item.end_at.should == DateTime.new(2011, 4, 4)
+    end
+
+    it "should lowercase slugs" do
+      @message[:payload][:value][:slug] = "/GOVERNMENT/POLICIES/SOME-POLICY"
+
+      PolicyEntries.update_from_message(@message)
+
+      PolicyEntries.first.slug.should == "/government/policies/some-policy"
+    end
+
+    it "should update slugs" do
+      record = PolicyEntries.new(
+        collected_at: DateTime.now,
+        source: "Google Analytics",
+        start_at: DateTime.new(2011, 3, 28),
+        end_at: DateTime.new(2011, 4, 4),
+        entries: 700,
+        slug: "/GOVERNMENT/POLICIES/SOME-POLICY"
+      )
+      record.save
+
+      PolicyEntries.update_from_message(@message)
+
+      PolicyEntries.first.slug.should == "/government/policies/some-policy"
+    end
+  end
 end

@@ -17,6 +17,7 @@ describe "policy (metadata) model" do
         }
       }
     end
+
     it "should insert a new policy" do
       Policy.update_from_message(@message)
       Policy.all.should have(1).item
@@ -66,6 +67,24 @@ describe "policy (metadata) model" do
 
     it "strip the leading '/government/policies' of the slug" do
       @message[:payload][:url] = "/government/policies/foo-bar"
+
+      Policy.update_from_message(@message)
+
+      policy = Policy.first
+      policy.slug.should == "foo-bar"
+    end
+
+    it "should strip the leading path parts regardless of case" do
+      @message[:payload][:url] = "/GOVERNMENT/POLICIES/foo-bar"
+
+      Policy.update_from_message(@message)
+
+      policy = Policy.first
+      policy.slug.should == "foo-bar"
+    end
+
+    it "should downcase the slug" do
+      @message[:payload][:url] = "FOO-BAR"
 
       Policy.update_from_message(@message)
 
