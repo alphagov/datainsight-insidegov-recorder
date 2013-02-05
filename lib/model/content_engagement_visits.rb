@@ -8,4 +8,8 @@ class ContentEngagementVisits
   property :slug, Text, required: true
   property :entries, Integer, required: true
   property :successes, Integer, required: true
+
+  def self.last_week_visits
+    ContentEngagementVisits.all(start_at: max(:start_at))
+  end
 end
