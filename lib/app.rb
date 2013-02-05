@@ -74,3 +74,10 @@ get "/format-success/weekly" do
   content_type :json
   response.to_json
 end
+
+get "/content-engagement-detail/weekly" do
+  response = ContentEngagementDetailPresenter.new.present(ContentEngagementVisits.all)
+
+  content_type :json
+  response.to_json
+end

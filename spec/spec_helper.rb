@@ -12,6 +12,7 @@ require "factory_girl"
 require_relative "../lib/datamapper_config"
 require_relative "../lib/model/weekly_reach"
 require_relative "../lib/model/format_visits"
+require_relative "../lib/model/content_engagement_visits"
 
 require "timecop"
 

@@ -248,4 +248,18 @@ describe "The api layer" do
       resource[:details][:data][1][:percentage_of_success].should be_within(0.0001).of(63.4968)
     end
   end
+
+  describe "/content-engagement-detail/weekly" do
+    it "should return content engagement detail data for the last week in json format" do
+      FactoryGirl.create(:content_engagement_visits)
+      get "/content-engagement-detail/weekly"
+
+      last_response.status.should == 200
+      last_response.content_type.should start_with("application/json")
+
+      resource = JSON.parse last_response.body, symbolize_names: true
+
+      resource[:response_info][:status].should == "ok"
+    end
+  end
 end
