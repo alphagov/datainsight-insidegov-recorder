@@ -4,8 +4,10 @@ Bundler.require(:default, :exposer)
 require_relative "model/weekly_reach"
 require_relative "model/policy_entries"
 require_relative "model/format_visits"
+require_relative "model/content_engagement_visits"
 require_relative "date_series_presenter"
 require_relative "format_success_presenter"
+require_relative "content_engagement_detail_presenter"
 require_relative "datamapper_config"
 require_relative "initializers"
 
@@ -76,7 +78,8 @@ get "/format-success/weekly" do
 end
 
 get "/content-engagement-detail/weekly" do
-  response = ContentEngagementDetailPresenter.new.present(ContentEngagementVisits.all)
+  content_engagement_visits = ContentEngagementVisits.last_week_visits
+  response = ContentEngagementDetailPresenter.new.present(content_engagement_visits)
 
   content_type :json
   response.to_json
