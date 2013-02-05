@@ -34,4 +34,14 @@ describe ContentEngagementDetailPresenter do
     response[:details][:source].should == ["Google Analytics"]
     response[:updated_at].should == "2013-01-21T00:00:00+00:00"
   end
+
+  it "should normally mark response as ok" do
+    list_of_content_engagement_visits = [
+      FactoryGirl.build(:content_engagement_visits)
+    ]
+
+    response = ContentEngagementDetailPresenter.new.present(list_of_content_engagement_visits)
+
+    response[:response_info][:status].should == "ok"
+  end
 end

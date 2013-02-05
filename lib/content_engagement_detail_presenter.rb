@@ -5,6 +5,7 @@ class ContentEngagementDetailPresenter
     updated_at = content_engagement_visits.map { |fv| fv.collected_at }.max
 
     {
+      response_info: {status: "ok"},
       :details => {
         :start_at => content_engagement_visits.first.start_at.strftime,
         :end_at => content_engagement_visits.first.end_at.strftime,
