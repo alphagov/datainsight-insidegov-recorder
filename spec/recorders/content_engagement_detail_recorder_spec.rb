@@ -37,4 +37,47 @@ describe "ContentEngagementDetailRecorder" do
     item.start_at.should == DateTime.new(2011, 3, 28)
     item.end_at.should == DateTime.new(2011, 4, 4)
   end
+  
+  it "should correctly handle end date over month boundaries" do
+    @message[:payload][:start_at] = "2011-08-25T00:00:00"
+    @message[:payload][:end_at] = "2011-09-01T00:00:00"
+    @recorder.update_message(@message)
+    item = ContentEngagementVisits.first
+    item.end_at.should == DateTime.new(2011, 9, 1)
+  end
+  
+  it "should update existing measurements" do
+    @recorder.update_message(@message)
+    @message[:payload][:value][:entries] = 900
+    @recorder.update_message(@message)
+    ContentEngagementVisits.all.length.should == 1
+    ContentEngagementVisits.first.entries.should == 900
+  end
+  
+  describe "validation" do
+    it "should fail if value is not present" do
+      @message[:payload].delete(:value)
+  
+      lambda do
+        @recorder.update_message(@message)
+      end.should raise_error
+    end
+  
+    it "should fail if value is not nil and cannot be parsed as a integer" do
+      @message[:payload][:value] = "invalid"
+  
+      lambda do
+        @recorder.update_message(@message)
+      end.should raise_error
+    end
+  
+    it "should allow nil as a value" do
+      @message[:payload][:value][:entries] = nil
+  
+      lambda do
+        @recorder.update_message(@message)
+      end.should_not raise_error
+    end
+  
+  end
 end
