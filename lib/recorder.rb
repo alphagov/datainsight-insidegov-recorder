@@ -6,6 +6,7 @@ require "datainsight_recorder/recorder"
 
 require_relative "model/policy_entries"
 require_relative "model/format_visits"
+require_relative "model/content_engagement_visits"
 require_relative "model/weekly_reach"
 
 class Recorder
@@ -19,6 +20,7 @@ class Recorder
     [
       "google_analytics.insidegov.entry_and_success.weekly",
       "google_analytics.insidegov.policy_entries.weekly",
+      "google_analytics.insidegov.content_engagement.weekly",
       "google_analytics.inside_gov.visitors.weekly",
       "inside_gov.policies"
     ]
@@ -31,6 +33,8 @@ class Recorder
         FormatVisits.update_from_message(message)
       when "google_analytics.insidegov.policy_entries.weekly"
         PolicyEntries.update_from_message(message)
+      when "google_analytics.insidegov.content_engagement.weekly"
+        ContentEngagementVisits.update_from_message(message)
       when "google_analytics.inside_gov.visitors.weekly"
         WeeklyReach.update_from_message(message)
       when "inside_gov.policies"
