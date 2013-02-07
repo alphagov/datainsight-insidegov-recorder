@@ -261,5 +261,13 @@ describe "The api layer" do
 
       resource[:response_info][:status].should == "ok"
     end
+
+    it "should return a 500 response if no data is available" do
+      ContentEngagementVisits.all.should be_empty
+
+      get "/content-engagement-detail/weekly"
+
+      last_response.status.should == 500
+    end
   end
 end
