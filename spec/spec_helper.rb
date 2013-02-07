@@ -18,6 +18,8 @@ require "timecop"
 
 FactoryGirl.find_definitions
 Datainsight::Logging.configure(:env => :test)
+::Logging.logger.root.level = :warn
+
 DataMapperConfig.configure(:test)
 
 RSpec.configure do |config|
