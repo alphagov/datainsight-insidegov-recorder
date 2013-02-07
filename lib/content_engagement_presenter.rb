@@ -1,6 +1,6 @@
 require_relative "response"
 
-class FormatSuccessPresenter
+class ContentEngagementPresenter
 
   def present(format_visits)
     sources = format_visits.map { |fv| fv.source }.uniq

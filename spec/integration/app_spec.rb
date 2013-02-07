@@ -225,7 +225,7 @@ describe "The api layer" do
   end
 
   describe "/format-success/weekly" do
-    it "should return format success data for the last week in json format" do
+    it "should return content engagement data for the last week in json format" do
       FactoryGirl.create(:format_visits, source: "format-data-source", format: "news", entries: 1000, successes: 500, collected_at: DateTime.new(2012, 10, 3, 12, 0, 0))
       FactoryGirl.create(:format_visits, source: "format-data-source", format: "policy", entries: 2345, successes: 1489, collected_at: DateTime.new(2012, 10, 3, 13, 0, 0))
 

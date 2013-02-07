@@ -6,7 +6,7 @@ require_relative "model/policy_entries"
 require_relative "model/format_visits"
 require_relative "model/content_engagement_visits"
 require_relative "date_series_presenter"
-require_relative "format_success_presenter"
+require_relative "content_engagement_presenter"
 require_relative "content_engagement_detail_presenter"
 require_relative "datamapper_config"
 require_relative "initializers"
@@ -71,7 +71,7 @@ end
 
 get "/format-success/weekly" do
   format_visits = FormatVisits.last_week_visits
-  response = FormatSuccessPresenter.new.present(format_visits)
+  response = ContentEngagementPresenter.new.present(format_visits)
 
   content_type :json
   response.to_json
