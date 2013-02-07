@@ -44,4 +44,26 @@ describe ContentEngagementDetailPresenter do
 
     response[:response_info][:status].should == "ok"
   end
+
+  it "should fail if start_at vary among given objects" do
+    list_of_content_engagement_visits = [
+        FactoryGirl.build(:content_engagement_visits,
+                          :start_at => Date.new(2012, 7, 1), :end_at => Date.new(2012, 7, 15)),
+        FactoryGirl.build(:content_engagement_visits,
+                          :start_at => Date.new(2012, 7, 8), :end_at => Date.new(2012, 7, 15)),
+    ]
+
+    lambda { ContentEngagementDetailPresenter.new.present(list_of_content_engagement_visits) }.should raise_exception
+  end
+
+  it "should fail if end_at vary among given objects" do
+    list_of_content_engagement_visits = [
+        FactoryGirl.build(:content_engagement_visits,
+                          :start_at => Date.new(2012, 7, 1), :end_at => Date.new(2012, 7, 7)),
+        FactoryGirl.build(:content_engagement_visits,
+                          :start_at => Date.new(2012, 7, 1), :end_at => Date.new(2012, 7, 15)),
+    ]
+
+    lambda { ContentEngagementDetailPresenter.new.present(list_of_content_engagement_visits) }.should raise_exception
+  end
 end

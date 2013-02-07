@@ -80,7 +80,7 @@ end
 get "/content-engagement-detail/weekly" do
   content_engagement_visits = ContentEngagementVisits.last_week_visits
   return 500 if content_engagement_visits.empty?
-  
+
   response = ContentEngagementDetailPresenter.new.present(content_engagement_visits)
 
   content_type :json

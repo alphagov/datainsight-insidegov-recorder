@@ -1,5 +1,8 @@
 class ContentEngagementDetailPresenter
   def present(content_engagement_visits)
+    ensure_equal(content_engagement_visits.map { |fv| fv.start_at }, :start_at)
+    ensure_equal(content_engagement_visits.map { |fv| fv.end_at }, :end_at)
+
     sources = content_engagement_visits.map { |fv| fv.source }.uniq
 
     updated_at = content_engagement_visits.map { |fv| fv.collected_at }.max
@@ -21,5 +24,12 @@ class ContentEngagementDetailPresenter
       },
       :updated_at => updated_at.strftime,
     }
+  end
+
+  private
+
+  def ensure_equal(values, field)
+    unique_values = values.uniq
+    raise "visits have different values for #{field}: #{unique_values}" if unique_values.count > 1
   end
 end
