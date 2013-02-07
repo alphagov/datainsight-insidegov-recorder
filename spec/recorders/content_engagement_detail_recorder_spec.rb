@@ -54,30 +54,4 @@ describe "ContentEngagementDetailRecorder" do
     ContentEngagementVisits.first.entries.should == 900
   end
   
-  describe "validation" do
-    it "should fail if value is not present" do
-      @message[:payload].delete(:value)
-  
-      lambda do
-        @recorder.update_message(@message)
-      end.should raise_error
-    end
-  
-    it "should fail if value is not nil and cannot be parsed as a integer" do
-      @message[:payload][:value] = "invalid"
-  
-      lambda do
-        @recorder.update_message(@message)
-      end.should raise_error
-    end
-  
-    it "should allow nil as a value" do
-      @message[:payload][:value][:entries] = nil
-  
-      lambda do
-        @recorder.update_message(@message)
-      end.should_not raise_error
-    end
-  
-  end
 end

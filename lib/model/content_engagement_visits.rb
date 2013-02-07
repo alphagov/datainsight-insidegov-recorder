@@ -9,13 +9,14 @@ class ContentEngagementVisits
   property :entries, Integer, required: true
   property :successes, Integer, required: true
 
+  validates_with_method :entries, method: :is_entries_positive?
+  validates_with_method :successes, method: :is_successes_positive?
+
   def self.last_week_visits
     ContentEngagementVisits.all(start_at: max(:start_at))
   end
 
   def self.update_from_message(message)
-    validate_message(message, :entries)
-    return if message[:payload][:value][:entries].nil?
     message[:payload][:value][:slug] = message[:payload][:value][:slug].downcase
     query = {
       :start_at => DateTime.parse(message[:payload][:start_at]),
@@ -48,9 +49,18 @@ class ContentEngagementVisits
     end
   end
 
-  def self.validate_message(message, metric)
-    raise "No value provided in message payload: #{message.inspect}" unless message[:payload].has_key? :value
-    raise "No metric value provided in message payload: #{message.inspect} #{metric}" unless message[:payload][:value].has_key? metric
+  private
+
+  def is_entries_positive?
+    is_positive?(entries)
   end
 
+  def is_successes_positive?
+    is_positive?(successes)
+  end
+
+  def is_positive?(value)
+    return [false, "It must be numeric"] unless value.is_a?(Numeric)
+    (value >= 0) ? true : [false, "It must be greater than or equal to 0"]
+  end
 end
