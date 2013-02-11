@@ -45,12 +45,4 @@ describe ContentEngagementPresenter do
     response[:details][:data].first[:percentage_of_success].should == 0
   end
 
-  it "should build an empty response if no visits are available" do
-    response = ContentEngagementPresenter.new.present([])
-
-    response[:details][:data].should == []
-    response[:details][:source].should == []
-    response[:updated_at].should be_nil
-  end
-
 end

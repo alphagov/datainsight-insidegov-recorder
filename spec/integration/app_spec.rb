@@ -24,8 +24,6 @@ describe "The api layer" do
         json_response = JSON.parse(last_response.body, symbolize_names: true)
         json_response[:updated_at].should == data_collection_date.strftime
         json_response[:response_info].should == {status: "ok"}
-        json_response[:id].should == "/visitors/weekly"
-        json_response[:web_url].should == ""
         json_response[:details][:data].length.should == 26
         json_response[:details][:source].should == ["Google Analytics"]
 
@@ -50,8 +48,6 @@ describe "The api layer" do
         json_response = JSON.parse(last_response.body, symbolize_names: true)
         json_response[:updated_at].should == data_collection_date.strftime
         json_response[:response_info].should == {status: "ok"}
-        json_response[:id].should == "/visitors/weekly"
-        json_response[:web_url].should == ""
         json_response[:details][:data].length.should == 12
         json_response[:details][:source].should == ["Google Analytics"]
 
@@ -94,8 +90,6 @@ describe "The api layer" do
         json_response = JSON.parse(last_response.body, symbolize_names: true)
         json_response[:updated_at].should == data_collection_date.strftime
         json_response[:response_info].should == {status: "ok"}
-        json_response[:id].should == "/visitors/weekly"
-        json_response[:web_url].should == ""
         json_response[:details][:data].length.should == 12
         json_response[:details][:source].should == ["Google Analytics"]
 

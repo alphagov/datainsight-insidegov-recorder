@@ -8,6 +8,7 @@ require_relative "model/content_engagement_visits"
 require_relative "presenter/date_series_presenter"
 require_relative "presenter/content_engagement_presenter"
 require_relative "presenter/content_engagement_detail_presenter"
+require_relative "presenter/policy_presenter"
 require_relative "datamapper_config"
 require_relative "initializers"
 
@@ -30,31 +31,10 @@ get "/entries/weekly/policies" do
 
   return 503 unless top_ten_policies.length == 10
 
-  {
-    response_info: {status: "ok"},
-    details: {
-      start_at: top_ten_policies.first.start_at.strftime,
-      end_at: top_ten_policies.first.end_at.strftime,
-      data: top_ten_policies.map { |policy_entry|
-        unless policy_entry.policy
-          logger.error { "No policy for #{policy_entry.slug}"}
-          return 503
-        end
-        {
-          entries: policy_entry.entries,
-          policy: {
-            title: policy_entry.policy.title,
-            web_url: "https://www.gov.uk/government/policies/#{policy_entry.slug}",
-            updated_at: policy_entry.policy.policy_updated_at,
-            organisations: JSON.parse(policy_entry.policy.organisations)
-          }
-        }
-      }
-    },
-    updated_at: top_ten_policies.map { |policy_entry| [policy_entry.collected_at] }.flatten.max
+  response = PolicyPresenter.new.present(top_ten_policies)
 
-  }.to_json
-
+  content_type :json
+  response.to_json
 end
 
 get "/visitors/weekly" do
