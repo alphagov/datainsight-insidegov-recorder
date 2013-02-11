@@ -1,4 +1,4 @@
-require_relative "date_utils"
+require_relative "../date_utils"
 
 class DateSeriesPresenter
   class Response

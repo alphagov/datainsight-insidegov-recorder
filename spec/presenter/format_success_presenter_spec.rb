@@ -1,5 +1,5 @@
-require "spec_helper"
-require_relative "../lib/content_engagement_presenter"
+require_relative "../spec_helper"
+require_relative "../../lib/presenter/content_engagement_presenter"
 
 describe ContentEngagementPresenter do
 

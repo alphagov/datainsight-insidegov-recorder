@@ -1,6 +1,6 @@
-require "spec_helper"
-require_relative "../lib/model/content_engagement_visits"
-require_relative "../lib/content_engagement_detail_presenter"
+require_relative "../spec_helper"
+require_relative "../../lib/model/content_engagement_visits"
+require_relative "../../lib/presenter/content_engagement_detail_presenter"
 
 describe ContentEngagementDetailPresenter do
   it "should create a content engagement detail response from a list of content engagement visits" do

@@ -1,5 +1,5 @@
-require_relative "spec_helper"
-require_relative "../lib/date_series_presenter"
+require_relative "../spec_helper"
+require_relative "../../lib/presenter/date_series_presenter"
 
 describe DateSeriesPresenter do
   describe "weekly" do
