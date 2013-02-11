@@ -1,26 +1,21 @@
-require_relative "response"
+require_relative "time_period_presenter"
 
 class ContentEngagementPresenter
 
   def present(format_visits)
-    sources = format_visits.map { |fv| fv.source }.uniq
-
-    date = format_visits.map { |fv| fv.collected_at }.max
-    update_date = format_date(date)
-
-    data = format_visits.map { |fv|
+    TimePeriodPresenter.new.present(format_visits) do |each|
       {
-          format: fv.format,
-          entries: fv.entries,
-          percentage_of_success: (fv.entries == 0 ? 0 : fv.successes * 100.0 / fv.entries)
+        format:   each.format,
+        entries:  each.entries,
+        successes: each.successes,
+        percentage_of_success: percentage_of_success(each)
       }
-    }
-
-    Response.build(data, sources, update_date)
+    end
   end
 
   private
-  def format_date(date)
-    date.present? ? date.strftime : nil
+
+  def percentage_of_success(each)
+    (each.entries == 0 ? 0 : each.successes * 100.0 / each.entries)
   end
 end
