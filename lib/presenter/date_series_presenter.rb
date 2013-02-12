@@ -1,4 +1,5 @@
 require_relative "../date_utils"
+require_relative "time_period_presenter"
 
 class DateSeriesPresenter
   class Response
@@ -48,16 +49,10 @@ class DateSeriesPresenter
         response_info: {status: "error"}
       }
     else
-      response = {
-        response_info: {status: "ok"},
-        id: @id,
-        web_url: "",
-        details: {
-          source: time_series_data.map(&:source).uniq,
-          data: add_missing_datapoints(time_series_data)
-        },
-        updated_at: time_series_data.map(&:collected_at).max
-      }
+      response = TimePeriodPresenter.new.build(
+        time_series_data,
+        add_missing_datapoints(time_series_data)
+      )
     end
     Response.new(response)
   end
