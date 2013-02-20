@@ -9,4 +9,8 @@ FactoryGirl.define do
     collected_at DateTime.new(2013, 1, 21, 0, 0, 0)
     source "Google Analytics"
   end
+
+  factory :content_engagement_visits_with_artefact, :parent => :content_engagement_visits do
+    association :artefact, factory: :artefact
+  end
 end

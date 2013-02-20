@@ -9,6 +9,8 @@ class ContentEngagementVisits
   property :entries, Integer, required: true
   property :successes, Integer, required: true
 
+  has 1, :artefact, :parent_key => [:format, :slug], :child_key => [:format, :slug]
+
   validates_with_method :entries, method: :is_entries_positive?
   validates_with_method :successes, method: :is_successes_positive?
 

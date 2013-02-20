@@ -245,7 +245,15 @@ describe "The api layer" do
 
   describe "/content-engagement-detail/weekly" do
     it "should return content engagement detail data for the last week in json format" do
-      FactoryGirl.create(:content_engagement_visits)
+      FactoryGirl.create(:content_engagement_visits,
+                         format: "policy", slug: "policy-foo", entries: 1000, successes: 500)
+      FactoryGirl.create(:artefact,
+                         format: "policy",
+                         slug: "policy-foo",
+                         title: "Foo is the new bar",
+                         url: "/government/policies/policy-foo",
+                         organisations: '[{"abbreviation":"MOD","name":"Ministry of defence"}]')
+
       get "/content-engagement-detail/weekly"
 
       last_response.status.should == 200
@@ -254,6 +262,15 @@ describe "The api layer" do
       resource = JSON.parse last_response.body, symbolize_names: true
 
       resource[:response_info][:status].should == "ok"
+      resource[:details][:data].should have(1).item
+
+      data_item = resource[:details][:data].first
+      data_item[:format].should == "policy"
+      data_item[:entries].should == 1000
+      data_item[:successes].should == 500
+      data_item[:slug].should == "policy-foo"
+      data_item[:title].should == "Foo is the new bar"
+      data_item[:url].should == "/government/policies/policy-foo"
     end
 
     it "should return a 500 response if no data is available" do

@@ -10,7 +10,9 @@ class ContentEngagementDetailPresenter
         :format => each.format,
         :slug => each.slug,
         :entries => each.entries,
-        :successes => each.successes
+        :successes => each.successes,
+        :title => each.artefact.title,
+        :url => each.artefact.url,
       }
     end
   end
