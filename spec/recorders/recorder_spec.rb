@@ -5,14 +5,22 @@ require "datainsight_recorder/test_helpers"
 describe Recorder do
   before(:each) do
     @recorder = Recorder.new
+
+    @message = {
+      :envelope => {},
+      :payload => {}
+    }
   end
+
+
   it "should listen to the correct topic" do
     should_listen_to_topics(
       "google_analytics.insidegov.policy_entries.weekly",
       "google_analytics.insidegov.content_engagement.weekly",
       "google_analytics.inside_gov.visitors.weekly",
       "google_analytics.insidegov.entry_and_success.weekly",
-      "inside_gov.policies"
+      "inside_gov.policies",
+      "inside_gov.artefacts"
     )
 
     @recorder.run
@@ -24,10 +32,11 @@ describe Recorder do
     ContentEngagementVisits.should_receive(:update_from_message)
     FormatVisits.should_receive(:update_from_message)
     Policy.should_receive(:update_from_message)
+    Artefact.should_receive(:update_from_message)
 
     @recorder.routing_keys.each do |key|
       expect {
-        @recorder.update_message(envelope: {_routing_key: key})
+        @recorder.update_message(@message.merge(envelope: {_routing_key: key}))
       }.to_not raise_error
     end
   end
@@ -55,5 +64,20 @@ describe Recorder do
   it "should send policy messages to the Policy model" do
     Policy.should_receive(:update_from_message)
     @recorder.update_message(envelope: {_routing_key: "inside_gov.policies"})
+  end
+
+  it "should send artefact messages to the Artefact model" do
+    Artefact.should_receive(:update_from_message)
+    @recorder.update_message(@message.merge(envelope: {_routing_key: "inside_gov.artefacts"}))
+  end
+
+  it "should send policy artefacts to the Policy model" do
+    Artefact.should_receive(:update_from_message)
+    Policy.should_receive(:update_from_message)
+
+    @recorder.update_message(
+      envelope: {_routing_key: "inside_gov.artefacts"},
+      payload: {type: "policy"}
+    )
   end
 end
