@@ -4,9 +4,9 @@ require_relative "../../lib/model/content_engagement_visits"
 describe ContentEngagementVisits do
   describe "last_week_visits" do
     it "should return visits for the available week" do
-      FactoryGirl.create(:content_engagement_visits, slug: "/foo",
+      FactoryGirl.create(:content_engagement_visits_with_artefact, slug: "/foo",
                          start_at: DateTime.new(2012, 7, 1), end_at: DateTime.new(2012, 7, 8))
-      FactoryGirl.create(:content_engagement_visits, slug: "/bar",
+      FactoryGirl.create(:content_engagement_visits_with_artefact, slug: "/bar",
                          start_at: DateTime.new(2012, 7, 1), end_at: DateTime.new(2012, 7, 8))
 
       older_item = FactoryGirl.create(:content_engagement_visits, slug: "/alfa",
@@ -18,11 +18,52 @@ describe ContentEngagementVisits do
       content_engagement_visits.should_not include(older_item)
     end
 
-    it "should return engagement together with artefact details"
-    it "should not return engagement that does not have a matching artefact"
-    it "should return artefacts even if they do not have matching engagement"
+    it "should return engagement together with artefact details" do
+      FactoryGirl.create(:content_engagement_visits_with_artefact, slug: "/foo",
+                         start_at: DateTime.new(2012, 7, 1), end_at: DateTime.new(2012, 7, 8))
+      FactoryGirl.create(:content_engagement_visits_with_artefact, slug: "/bar",
+                         start_at: DateTime.new(2012, 7, 1), end_at: DateTime.new(2012, 7, 8))
 
-    it "should not return artefacts that have been disabled"
+      engagement = ContentEngagementVisits.last_week_visits
+
+      engagement.should have(2).items
+      engagement.first.artefact.should_not be_nil
+    end
+
+    it "should not return engagement that does not have a matching artefact" do
+      FactoryGirl.create(:content_engagement_visits, slug: "/foo",
+                         start_at: DateTime.new(2012, 7, 1), end_at: DateTime.new(2012, 7, 8))
+      FactoryGirl.create(:content_engagement_visits_with_artefact, slug: "/bar",
+                         start_at: DateTime.new(2012, 7, 1), end_at: DateTime.new(2012, 7, 8))
+
+      engagement = ContentEngagementVisits.last_week_visits
+
+      engagement.should have(1).item
+      engagement.first.slug.should == "/bar"
+    end
+
+    it "should return artefacts even if they do not have matching engagement" do
+      FactoryGirl.create(:content_engagement_visits_with_artefact, slug: "/foo",
+                         start_at: DateTime.new(2012, 7, 1), end_at: DateTime.new(2012, 7, 8))
+      FactoryGirl.create(:artefact, slug: "/bar")
+
+      engagement = ContentEngagementVisits.last_week_visits
+
+      engagement.should have(2).items
+    end
+
+    it "should not return artefacts that have been disabled" do
+      engagement = FactoryGirl.create(:content_engagement_visits_with_artefact, slug: "/foo",
+                         start_at: DateTime.new(2012, 7, 1), end_at: DateTime.new(2012, 7, 8))
+      FactoryGirl.create(:content_engagement_visits_with_artefact, slug: "/bar",
+                         start_at: DateTime.new(2012, 7, 1), end_at: DateTime.new(2012, 7, 8))
+      engagement.artefact.disabled = true
+      engagement.artefact.save
+
+      engagement = ContentEngagementVisits.last_week_visits
+
+      engagement.should have(1).item
+    end
   end
 
   describe "update_from_message" do

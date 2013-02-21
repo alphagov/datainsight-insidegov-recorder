@@ -1,3 +1,4 @@
+require_relative "artefact"
 
 class ContentEngagementVisits
   include DataMapper::Resource
@@ -9,13 +10,33 @@ class ContentEngagementVisits
   property :entries, Integer, required: true
   property :successes, Integer, required: true
 
-  has 1, :artefact, :parent_key => [:format, :slug], :child_key => [:format, :slug]
-
   validates_with_method :entries, method: :is_entries_positive?
   validates_with_method :successes, method: :is_successes_positive?
 
+  attr_reader :artefact
+
   def self.last_week_visits
-    ContentEngagementVisits.all(start_at: max(:start_at))
+    engagement = self.all(start_at: max(:start_at)).first
+    results = repository(:default).adapter.query("SELECT artefacts.title, artefacts.url, artefacts.slug, artefacts.format, engagement.start_at, engagement.end_at, engagement.entries, engagement.successes
+FROM artefacts
+LEFT JOIN content_engagement_visits AS engagement ON (start_at='#{engagement.start_at}' AND engagement.slug=artefacts.slug AND engagement.format=artefacts.format)
+ORDER BY engagement.entries DESC"
+    )
+    results.map do |result|
+      OpenStruct.new(
+        format: result.format,
+        slug: result.slug,
+        entries: result.entries || 0,
+        successes: result.successes || 0,
+        start_at: engagement.start_at,
+        end_at: engagement.end_at,
+        collected_at: engagement.collected_at,
+        artefact: OpenStruct.new(
+          title: result.title,
+          url: result.url
+        )
+      )
+    end
   end
 
   def self.update_from_message(message)
@@ -52,6 +73,8 @@ class ContentEngagementVisits
   end
 
   private
+  attr_writer :artefact
+
 
   def is_entries_positive?
     is_positive?(entries)

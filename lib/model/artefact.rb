@@ -7,9 +7,9 @@ class Artefact
 
   property :format, String, required: true
   property :slug, String, length: 255, required: true
-  property :title, Text, required: true
-  property :url, Text, required: true
-  property :organisations, Text, required: true
+  property :title, String, length: 255, required: true
+  property :url, String, length: 255, required: true
+  property :organisations, Text, lazy: false, required: true
   property :artefact_updated_at, DateTime, required: true
   property :disabled, Boolean, required: true, default: false
 
