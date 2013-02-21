@@ -65,6 +65,36 @@ describe ContentEngagementVisits do
 
       engagement.should have(1).item
     end
+
+    it "should not return news artefacts older than 2 months" do
+      Timecop.freeze(DateTime.new(2013, 2, 21)) {
+        policy_artefact_older_than_2_months = FactoryGirl.create(
+                                        :content_engagement_visits_with_artefact, slug: "/foo",
+                                        start_at: DateTime.new(2012, 7, 1), end_at: DateTime.new(2012, 7, 8))
+
+        news_artefact_older_than_2_months =
+          FactoryGirl.create(:artefact, :format => "news", :artefact_updated_at => DateTime.new(2012, 12, 1))
+        news_artefact_younger_than_2_months =
+          FactoryGirl.create(:artefact, :format => "news", :artefact_updated_at => DateTime.new(2013, 1, 1))
+
+        engagement = ContentEngagementVisits.last_week_visits
+        engagement.should have(2).item
+      }
+    end
+
+    it "should return policy artefacts older than 2 months" do
+      Timecop.freeze(DateTime.new(2013, 2, 21)) {
+        policy_artefact_older_than_2_months = FactoryGirl.create(
+          :content_engagement_visits_with_artefact, slug: "/foo",
+          start_at: DateTime.new(2012, 7, 1), end_at: DateTime.new(2013, 1, 15))
+        policy_artefact_older_than_2_months = FactoryGirl.create(
+          :content_engagement_visits_with_artefact, slug: "/foo",
+          start_at: DateTime.new(2012, 7, 1), end_at: DateTime.new(2012, 7, 8))
+
+        engagement = ContentEngagementVisits.last_week_visits
+        engagement.should have(2).item
+      }
+    end
   end
 
   describe "update_from_message" do

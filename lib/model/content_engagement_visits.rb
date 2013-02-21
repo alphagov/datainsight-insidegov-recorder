@@ -19,7 +19,11 @@ class ContentEngagementVisits
     visits = ContentEngagementVisits.all(start_at: max(:start_at))
     visits_hash = Hash[visits.map { |visits| [[visits.format, visits.slug], visits] }]
 
-    Artefact.all(disabled: false).map do |artefact|
+    # all artefacts that are not disabled, except news ones older than two months
+    (
+      Artefact.all(disabled: false) -
+      Artefact.all(:format => 'news', :artefact_updated_at.lt => (Date.today << 2))
+    ).map do |artefact|
       visits_for(artefact, visits_hash)
     end
   end
