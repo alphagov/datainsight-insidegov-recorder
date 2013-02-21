@@ -12,7 +12,7 @@ class TimePeriodPresenter
   end
 
   def updated_at(data)
-    data.map(&:collected_at).max
+    data.map(&:collected_at).compact.max
   end
 
   def present(data, &block)

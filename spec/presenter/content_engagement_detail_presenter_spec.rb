@@ -72,4 +72,16 @@ describe ContentEngagementDetailPresenter do
 
     lambda { ContentEngagementDetailPresenter.new.present(list_of_content_engagement_visits) }.should raise_exception
   end
+
+  it "should not fail if artefacts with no associated visits are in the result set" do
+    engagement = FactoryGirl.build(:content_engagement_visits_with_artefact,
+                                           :start_at => Date.new(2012, 7, 1), :end_at => Date.new(2012, 7, 7))
+    fake_engagements_lookup_table = { [nil, nil] => engagement }
+    list_of_content_engagement_visits = [
+      engagement,
+      ContentEngagementVisits.visits_for(FactoryGirl.build(:artefact), fake_engagements_lookup_table)
+    ]
+
+    lambda { ContentEngagementDetailPresenter.new.present(list_of_content_engagement_visits) }.should_not raise_exception
+  end
 end
