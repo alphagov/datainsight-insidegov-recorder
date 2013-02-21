@@ -22,7 +22,6 @@ class Recorder
       "google_analytics.insidegov.policy_entries.weekly",
       "google_analytics.insidegov.content_engagement.weekly",
       "google_analytics.inside_gov.visitors.weekly",
-      "inside_gov.policies",
       "inside_gov.artefacts"
     ]
   end
@@ -38,13 +37,8 @@ class Recorder
         ContentEngagementVisits.update_from_message(message)
       when "google_analytics.inside_gov.visitors.weekly"
         WeeklyReach.update_from_message(message)
-      when "inside_gov.policies"
-        Policy.update_from_message(message)
       when "inside_gov.artefacts"
         Artefact.update_from_message(message)
-        if message[:payload][:type] == "policy"
-          Policy.update_from_message(message)
-        end
       else
         raise "Unsupported routing key: #{routing_key}"
     end

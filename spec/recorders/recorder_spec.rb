@@ -19,7 +19,6 @@ describe Recorder do
       "google_analytics.insidegov.content_engagement.weekly",
       "google_analytics.inside_gov.visitors.weekly",
       "google_analytics.insidegov.entry_and_success.weekly",
-      "inside_gov.policies",
       "inside_gov.artefacts"
     )
 
@@ -31,7 +30,6 @@ describe Recorder do
     PolicyEntries.should_receive(:update_from_message)
     ContentEngagementVisits.should_receive(:update_from_message)
     FormatVisits.should_receive(:update_from_message)
-    Policy.should_receive(:update_from_message)
     Artefact.should_receive(:update_from_message)
 
     @recorder.routing_keys.each do |key|
@@ -61,23 +59,8 @@ describe Recorder do
     @recorder.update_message(envelope: {_routing_key: "google_analytics.insidegov.content_engagement.weekly"})
   end
 
-  it "should send policy messages to the Policy model" do
-    Policy.should_receive(:update_from_message)
-    @recorder.update_message(envelope: {_routing_key: "inside_gov.policies"})
-  end
-
   it "should send artefact messages to the Artefact model" do
     Artefact.should_receive(:update_from_message)
     @recorder.update_message(@message.merge(envelope: {_routing_key: "inside_gov.artefacts"}))
-  end
-
-  it "should send policy artefacts to the Policy model" do
-    Artefact.should_receive(:update_from_message)
-    Policy.should_receive(:update_from_message)
-
-    @recorder.update_message(
-      envelope: {_routing_key: "inside_gov.artefacts"},
-      payload: {type: "policy"}
-    )
   end
 end

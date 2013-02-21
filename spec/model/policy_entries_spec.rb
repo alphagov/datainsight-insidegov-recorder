@@ -64,7 +64,7 @@ describe "the policy_entries model" do
     end
 
     it "should not return policy entries if there is no corresponding policy" do
-      Policy.all.destroy
+      Artefact.all.destroy
       Timecop.travel(DateTime.new(2012, 12, 31, 13, 32)) do
         top_five = PolicyEntries.top_last_week(5)
         top_five.should have(0).items
@@ -130,17 +130,17 @@ describe "the policy_entries model" do
   describe "policy join" do
     before(:each) do
       FactoryGirl.create :policy_entries, slug: "/my-slug"
-      FactoryGirl.create :policy, slug: "/my-slug"
+      FactoryGirl.create :artefact, slug: "/my-slug"
     end
 
     it "should return the joined policy" do
       policy_entries = PolicyEntries.first
-      policy_entries.policy.should be_a(Policy)
+      policy_entries.policy.should be_an(Artefact)
       policy_entries.policy.slug.should == "/my-slug"
     end
 
     it "should return nil if no policy is" do
-      Policy.destroy
+      Artefact.destroy
       policy_entries = PolicyEntries.first
       policy_entries.policy.should be_nil
     end

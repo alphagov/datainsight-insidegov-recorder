@@ -11,6 +11,6 @@ FactoryGirl.define do
     start_at DateTime.parse("2012-08-06")
     end_at DateTime.parse("2012-08-13")
 
-    association :policy, factory: :policy
+    association :policy, factory: :artefact
   end
 end

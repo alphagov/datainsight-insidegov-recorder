@@ -122,4 +122,96 @@ describe Artefact do
       Artefact.first.format.should == "news"
     end
   end
+
+  describe "validation" do
+    describe "required fields" do
+      it "should require a slug" do
+        artefact = Artefact.new(
+          title: "test",
+          source: "source",
+          organisations: '[{"abbreviation":"MOD","name":"Ministry of Defence"}]',
+          artefact_updated_at: DateTime.parse("2012-11-19T16:00:07+00:00"),
+          collected_at: DateTime.parse("2012-11-19T16:00:07+00:00"))
+
+        artefact.valid?.should == false
+        artefact.errors[:slug].first.should == "Slug must not be blank"
+      end
+
+      it "should require a title" do
+        artefact = Artefact.new(
+          slug: "test",
+          source: "source",
+          organisations: '[{"abbreviation":"MOD","name":"Ministry of Defence"}]',
+          artefact_updated_at: DateTime.parse("2012-11-19T16:00:07+00:00"),
+          collected_at: DateTime.parse("2012-11-19T16:00:07+00:00"))
+
+        artefact.valid?.should == false
+        artefact.errors[:title].first.should == "Title must not be blank"
+      end
+
+      it "should require an organisations" do
+        artefact = Artefact.new(
+          slug: "test",
+          title: "test",
+          source: "source",
+          artefact_updated_at: DateTime.parse("2012-11-19T16:00:07+00:00"),
+          collected_at: DateTime.parse("2012-11-19T16:00:07+00:00"))
+
+        artefact.valid?.should == false
+        artefact.errors[:organisations].first.should == "Organisations must not be blank"
+      end
+
+      it "should require an artefact_updated_at" do
+        artefact = Artefact.new(
+          slug: "test",
+          title: "test",
+          source: "source",
+          organisations: '[{"abbreviation":"MOD","name":"Ministry of Defence"}]',
+          collected_at: DateTime.parse("2012-11-19T16:00:07+00:00"))
+
+        artefact.valid?.should == false
+        artefact.errors[:artefact_updated_at].first.should == "Artefact updated at must not be blank"
+      end
+
+      it "should require a collected_at" do
+        artefact = Artefact.new(
+          slug: "test",
+          title: "test",
+          source: "source",
+          organisations: '[{"abbreviation":"MOD","name":"Ministry of Defence"}]',
+          artefact_updated_at: DateTime.parse("2012-11-19T16:00:07+00:00"))
+
+        artefact.valid?.should == false
+        artefact.errors[:collected_at].first.should == "Collected at must not be blank"
+      end
+
+    end
+
+    it "should require a source" do
+      artefact = Artefact.new(
+        slug: "test",
+        title: "test",
+        organisations: '[{"abbreviation":"MOD","name":"Ministry of Defence"}]',
+        artefact_updated_at: DateTime.parse("2012-11-19T16:00:07+00:00"),
+        collected_at: DateTime.parse("2012-11-19T16:00:07+00:00"))
+
+      artefact.valid?.should == false
+      artefact.errors[:source].first.should == "Source must not be blank"
+
+    end
+
+    it "should validate artefact_updated_at correctly (must be DateTime)" do
+      artefact = Artefact.new(
+        slug: "test",
+        title: "test",
+        source: "source",
+        organisations: '[{"abbreviation":"MOD","name":"Ministry of Defence"}]',
+        artefact_updated_at: DateTime.parse("2012-11-19T16:00:07+00:00"),
+        collected_at: "not_a_date_time")
+
+      artefact.valid?.should == false
+      artefact.errors[:collected_at].first.should == "Collected at must be of type DateTime"
+    end
+  end
+
 end

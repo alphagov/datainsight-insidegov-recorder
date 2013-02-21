@@ -34,18 +34,18 @@ describe PolicyPresenter do
         FactoryGirl.build(:policy_entries,
             entries: 123,
             slug: "slug-1",
-            policy: FactoryGirl.build(:policy,
+            policy: FactoryGirl.build(:artefact,
               title:      "Title one",
-              policy_updated_at: DateTime.new(2012, 12, 12, 12, 12, 12),
+              artefact_updated_at: DateTime.new(2012, 12, 12, 12, 12, 12),
               organisations: '{"foo":"bar"}'
             )
         ),
         FactoryGirl.build(:policy_entries,
             entries: 231,
             slug: "slug-2",
-            policy: FactoryGirl.build(:policy,
+            policy: FactoryGirl.build(:artefact,
               title: "Title two",
-              policy_updated_at: DateTime.new(2012, 12, 13, 12, 12, 12),
+              artefact_updated_at: DateTime.new(2012, 12, 13, 12, 12, 12),
               organisations: '{"foo":"bar"}'
             )
 
@@ -53,9 +53,9 @@ describe PolicyPresenter do
         FactoryGirl.build(:policy_entries,
             entries: 312,
             slug: "slug-2",
-            policy: FactoryGirl.build(:policy,
+            policy: FactoryGirl.build(:artefact,
               title:      "Title three",
-              policy_updated_at: DateTime.new(2012, 12, 14, 12, 12, 12),
+              artefact_updated_at: DateTime.new(2012, 12, 14, 12, 12, 12),
               organisations: '{"foo":"bar"}'
             )
         )

@@ -111,11 +111,11 @@ describe "The api layer" do
     it "should serve up a json response" do
       9.times { |n| FactoryGirl.create :policy_entries, entries: n }
 
-      FactoryGirl.create :policy,
+      FactoryGirl.create :artefact,
                          slug: "sample-policy",
                          title: "Sample Policy",
                          organisations: '[{"abbreviation":"MOD","name":"Ministry of defence"}]',
-                         policy_updated_at: DateTime.parse("2012-12-19T02:00:00+00:00"),
+                         artefact_updated_at: DateTime.parse("2012-12-19T02:00:00+00:00"),
                          collected_at: DateTime.parse("2012-12-20T02:00:00+00:00")
 
       FactoryGirl.create :policy_entries,
@@ -154,7 +154,7 @@ describe "The api layer" do
                          slug: "sample-policy",
                          collected_at: DateTime.parse("2012-12-20T01:00:00+00:00")
 
-      Policy.destroy
+      Artefact.destroy
 
       get "/entries/weekly/policies"
 

@@ -2,8 +2,6 @@ require "data_mapper"
 require "datainsight_recorder/base_fields"
 require "datainsight_recorder/time_series"
 
-require_relative "policy"
-
 class PolicyEntries
   include DataMapper::Resource
   include DataInsight::Recorder::BaseFields
@@ -12,7 +10,8 @@ class PolicyEntries
   property :entries, Integer, required: true
   property :slug, Text, required: true
 
-  has 1, :policy,
+  has 1, :policy, "Artefact",
+      :format => "policy",
       :parent_key => [:slug],
       :child_key => [:slug]
 
