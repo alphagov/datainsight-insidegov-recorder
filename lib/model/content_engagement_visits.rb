@@ -1,3 +1,4 @@
+require_relative "artefact"
 
 class ContentEngagementVisits
   include DataMapper::Resource
@@ -9,13 +10,30 @@ class ContentEngagementVisits
   property :entries, Integer, required: true
   property :successes, Integer, required: true
 
-  has 1, :artefact, :parent_key => [:format, :slug], :child_key => [:format, :slug]
-
   validates_with_method :entries, method: :is_entries_positive?
   validates_with_method :successes, method: :is_successes_positive?
 
+  attr_reader :artefact
+
   def self.last_week_visits
-    ContentEngagementVisits.all(start_at: max(:start_at))
+    visits = ContentEngagementVisits.all(start_at: max(:start_at))
+    visits_hash = Hash[visits.map { |visits| [[visits.format, visits.slug], visits] }]
+
+    Artefact.all(disabled: false).map do |artefact|
+      visits_for(artefact, visits_hash).tap { |visits| visits.send(:artefact=, artefact) }
+    end
+  end
+
+  def self.visits_for(artefact, visits)
+    artefact_visits = visits[[artefact.format, artefact.slug]]
+    artefact_visits || ContentEngagementVisits.new(
+      entries: 0,
+      successes: 0,
+      slug: artefact.slug,
+      format: artefact.format,
+      start_at: visits.values.first[:start_at],
+      end_at: visits.values.first[:end_at]
+    )
   end
 
   def self.update_from_message(message)
@@ -52,6 +70,8 @@ class ContentEngagementVisits
   end
 
   private
+  attr_writer :artefact
+
 
   def is_entries_positive?
     is_positive?(entries)
