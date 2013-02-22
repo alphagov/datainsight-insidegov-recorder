@@ -16,29 +16,43 @@ class ContentEngagementVisits
   attr_reader :artefact
 
   def self.last_week_visits
-    visits = ContentEngagementVisits.all(start_at: max(:start_at))
-    visits_hash = Hash[visits.map { |visits| [[visits.format, visits.slug], visits] }]
+    results = repository(:default).adapter.select(
+      "select * from content_engagement_visits c
+       right join artefacts a
+       on (c.slug = a.slug
+         and c.format = a.format
+         and c.start_at = (select max(start_at) from content_engagement_visits))
+       where (
+        a.disabled = false
+        and (a.format != 'news'
+          or a.format = 'news' and (c.entries > 1000 or a.artefact_updated_at > ?)))",
+      (DateTime.now << 2))
 
-    # all artefacts that are not disabled, except news ones older than two months
-    (
-      Artefact.all(disabled: false) -
-      Artefact.all(:format => 'news', :artefact_updated_at.lt => (Date.today << 2))
-    ).map do |artefact|
-      visits_for(artefact, visits_hash)
-    end
-  end
-
-  def self.visits_for(artefact, visits)
-    artefact_visits = visits[[artefact.format, artefact.slug]]
-    engagement = artefact_visits || ContentEngagementVisits.new(
-      entries: 0,
-      successes: 0,
-      slug: artefact.slug,
-      format: artefact.format,
-      start_at: visits.values.first[:start_at],
-      end_at: visits.values.first[:end_at]
-    )
-    engagement.tap { |visits| visits.send(:artefact=, artefact) }
+    results.map { |each|
+      ContentEngagementVisits.new(
+        :format => each.format,
+        :slug => each.slug,
+        :entries => (each.entries or 0),
+        :successes => (each.successes or 0),
+        :start_at => each.start_at,
+        :end_at => each.end_at,
+        :collected_at => each.collected_at,
+        :source => each.source
+      ).tap { |engagement|
+        engagement.send(
+          :artefact=,
+            Artefact.new(
+              :format => each.format,
+              :slug => each.slug,
+              :title => each.title,
+              :url => each.url,
+              :organisations => each.organisations,
+              :artefact_updated_at => each.artefact_updated_at,
+              :disabled => each.disabled,
+              :source => each.source
+            ))
+      }
+    }
   end
 
   def self.update_from_message(message)
