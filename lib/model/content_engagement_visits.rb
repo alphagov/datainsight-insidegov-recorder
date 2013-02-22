@@ -28,14 +28,17 @@ class ContentEngagementVisits
           or a.format = 'news' and (c.entries > 1000 or a.artefact_updated_at > ?)))",
       (DateTime.now << 2))
 
+    start_at = results.map { |each| each.start_at }.compact.first
+    end_at = results.map { |each| each.end_at }.compact.first
+    
     results.map { |each|
       ContentEngagementVisits.new(
         :format => each.format,
         :slug => each.slug,
         :entries => (each.entries or 0),
         :successes => (each.successes or 0),
-        :start_at => each.start_at,
-        :end_at => each.end_at,
+        :start_at => start_at,
+        :end_at => end_at,
         :collected_at => each.collected_at,
         :source => each.source
       ).tap { |engagement|
