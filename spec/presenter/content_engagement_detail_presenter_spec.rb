@@ -5,8 +5,8 @@ require_relative "../../lib/presenter/content_engagement_detail_presenter"
 describe ContentEngagementDetailPresenter do
   it "should create a content engagement detail response from a list of content engagement visits" do
     list_of_content_engagement_visits = [
-      FactoryGirl.build(:content_engagement_visits_with_artefact),
-      FactoryGirl.build(:content_engagement_visits_with_artefact)
+      FactoryGirl.create(:content_engagement_visits_with_artefact),
+      FactoryGirl.create(:content_engagement_visits_with_artefact)
     ]
 
     response = ContentEngagementDetailPresenter.new.present(list_of_content_engagement_visits)
@@ -16,8 +16,8 @@ describe ContentEngagementDetailPresenter do
 
   it "should create a content engagement detail response with correct data format" do
     list_of_content_engagement_visits = [
-      FactoryGirl.build(:content_engagement_visits_with_artefact),
-      FactoryGirl.build(:content_engagement_visits_with_artefact)
+      FactoryGirl.create(:content_engagement_visits_with_artefact),
+      FactoryGirl.create(:content_engagement_visits_with_artefact)
     ]
 
     response = ContentEngagementDetailPresenter.new.present(list_of_content_engagement_visits)
@@ -30,7 +30,7 @@ describe ContentEngagementDetailPresenter do
 
   it "should create a content engagement detail response with standard metadata" do
     list_of_content_engagement_visits = [
-      FactoryGirl.build(:content_engagement_visits_with_artefact)
+      FactoryGirl.create(:content_engagement_visits_with_artefact)
     ]
 
     response = ContentEngagementDetailPresenter.new.present(list_of_content_engagement_visits)
@@ -43,7 +43,7 @@ describe ContentEngagementDetailPresenter do
 
   it "should normally mark response as ok" do
     list_of_content_engagement_visits = [
-      FactoryGirl.build(:content_engagement_visits_with_artefact)
+      FactoryGirl.create(:content_engagement_visits_with_artefact)
     ]
 
     response = ContentEngagementDetailPresenter.new.present(list_of_content_engagement_visits)
@@ -53,9 +53,9 @@ describe ContentEngagementDetailPresenter do
 
   it "should fail if start_at vary among given objects" do
     list_of_content_engagement_visits = [
-        FactoryGirl.build(:content_engagement_visits_with_artefact,
+        FactoryGirl.create(:content_engagement_visits_with_artefact,
                           :start_at => Date.new(2012, 7, 1), :end_at => Date.new(2012, 7, 15)),
-        FactoryGirl.build(:content_engagement_visits_with_artefact,
+        FactoryGirl.create(:content_engagement_visits_with_artefact,
                           :start_at => Date.new(2012, 7, 8), :end_at => Date.new(2012, 7, 15)),
     ]
 
@@ -64,9 +64,9 @@ describe ContentEngagementDetailPresenter do
 
   it "should fail if end_at vary among given objects" do
     list_of_content_engagement_visits = [
-        FactoryGirl.build(:content_engagement_visits_with_artefact,
+        FactoryGirl.create(:content_engagement_visits_with_artefact,
                           :start_at => Date.new(2012, 7, 1), :end_at => Date.new(2012, 7, 7)),
-        FactoryGirl.build(:content_engagement_visits_with_artefact,
+        FactoryGirl.create(:content_engagement_visits_with_artefact,
                           :start_at => Date.new(2012, 7, 1), :end_at => Date.new(2012, 7, 15)),
     ]
 
@@ -74,12 +74,12 @@ describe ContentEngagementDetailPresenter do
   end
 
   it "should not fail if artefacts with no associated visits are in the result set" do
-    engagement = FactoryGirl.build(:content_engagement_visits_with_artefact,
+    engagement = FactoryGirl.create(:content_engagement_visits_with_artefact,
                                            :start_at => Date.new(2012, 7, 1), :end_at => Date.new(2012, 7, 7))
     fake_engagements_lookup_table = { [nil, nil] => engagement }
     list_of_content_engagement_visits = [
       engagement,
-      ContentEngagementVisits.visits_for(FactoryGirl.build(:artefact), fake_engagements_lookup_table)
+      ContentEngagementVisits.visits_for(FactoryGirl.create(:artefact), fake_engagements_lookup_table)
     ]
 
     lambda { ContentEngagementDetailPresenter.new.present(list_of_content_engagement_visits) }.should_not raise_exception

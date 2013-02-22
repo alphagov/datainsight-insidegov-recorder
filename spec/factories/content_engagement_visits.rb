@@ -11,6 +11,9 @@ FactoryGirl.define do
   end
 
   factory :content_engagement_visits_with_artefact, :parent => :content_engagement_visits do
-    association :artefact, factory: :artefact
+    after(:create) do |engagement, evaluator|
+      engagement.send(:artefact=,
+                      FactoryGirl.create(:artefact, :slug => engagement.slug, :format => engagement.format))
+    end
   end
 end

@@ -4,73 +4,79 @@ require_relative "../../lib/model/content_engagement_visits"
 describe ContentEngagementVisits do
   describe "last_week_visits" do
     it "should return visits for the available week" do
-      FactoryGirl.create(:content_engagement_visits_with_artefact, slug: "/foo",
-                         start_at: DateTime.new(2012, 7, 1), end_at: DateTime.new(2012, 7, 8))
-      FactoryGirl.create(:content_engagement_visits_with_artefact, slug: "/bar",
-                         start_at: DateTime.new(2012, 7, 1), end_at: DateTime.new(2012, 7, 8))
+      FactoryGirl.create(:content_engagement_visits_with_artefact, format: "policy", slug: "/foo",
+                         start_at: DateTime.new(2012, 7, 1), end_at: DateTime.new(2012, 7, 8), entries: 1)
+      FactoryGirl.create(:content_engagement_visits_with_artefact, format: "policy", slug: "/bar",
+                         start_at: DateTime.new(2012, 7, 1), end_at: DateTime.new(2012, 7, 8), entries: 2)
 
-      older_item = FactoryGirl.create(:content_engagement_visits, slug: "/alfa",
-                                      start_at: DateTime.new(2012, 6, 24), end_at: DateTime.new(2012, 7, 1))
+      older_item = FactoryGirl.create(:content_engagement_visits, format: "policy", slug: "/alfa",
+                                      start_at: DateTime.new(2012, 6, 24), end_at: DateTime.new(2012, 7, 1),
+                                      entries: 3)
 
       content_engagement_visits = ContentEngagementVisits.last_week_visits
 
       content_engagement_visits.should have(2).items
+      content_engagement_visits.map(&:entries).should == [1, 2]
       content_engagement_visits.should_not include(older_item)
     end
 
     it "should return engagement together with artefact details" do
-      FactoryGirl.create(:content_engagement_visits_with_artefact, slug: "/foo",
-                         start_at: DateTime.new(2012, 7, 1), end_at: DateTime.new(2012, 7, 8))
-      FactoryGirl.create(:content_engagement_visits_with_artefact, slug: "/bar",
-                         start_at: DateTime.new(2012, 7, 1), end_at: DateTime.new(2012, 7, 8))
+      FactoryGirl.create(:content_engagement_visits_with_artefact, format: "policy", slug: "/foo",
+                         start_at: DateTime.new(2012, 7, 1), end_at: DateTime.new(2012, 7, 8), :entries => 9)
+      FactoryGirl.create(:content_engagement_visits_with_artefact, format: "policy", slug: "/bar",
+                         start_at: DateTime.new(2012, 7, 1), end_at: DateTime.new(2012, 7, 8), :entries => 21)
 
       engagement = ContentEngagementVisits.last_week_visits
 
       engagement.should have(2).items
+      engagement.map(&:entries).should == [9, 21]
       engagement.first.artefact.should_not be_nil
     end
 
     it "should not return engagement that does not have a matching artefact" do
-      FactoryGirl.create(:content_engagement_visits, slug: "/foo",
-                         start_at: DateTime.new(2012, 7, 1), end_at: DateTime.new(2012, 7, 8))
-      FactoryGirl.create(:content_engagement_visits, slug: "/bar",
-                         start_at: DateTime.new(2012, 7, 1), end_at: DateTime.new(2012, 7, 8))
-      FactoryGirl.create(:artefact, slug: "/bar")
+      FactoryGirl.create(:content_engagement_visits, format: "policy", slug: "/foo",
+                         start_at: DateTime.new(2012, 7, 1), end_at: DateTime.new(2012, 7, 8), :entries => 15)
+      FactoryGirl.create(:content_engagement_visits, format: "policy", slug: "/bar",
+                         start_at: DateTime.new(2012, 7, 1), end_at: DateTime.new(2012, 7, 8), :entries => 64)
+      FactoryGirl.create(:artefact, format: "policy", slug: "/bar")
 
       engagement = ContentEngagementVisits.last_week_visits
 
       engagement.should have(1).item
+      engagement.map(&:entries).should == [64]
       engagement.first.slug.should == "/bar"
     end
 
     it "should return artefacts even if they do not have matching engagement" do
-      FactoryGirl.create(:content_engagement_visits_with_artefact, slug: "/foo",
-                         start_at: DateTime.new(2012, 7, 1), end_at: DateTime.new(2012, 7, 8))
+      FactoryGirl.create(:content_engagement_visits_with_artefact, slug: "/foo", format: "policy",
+                         start_at: DateTime.new(2012, 7, 1), end_at: DateTime.new(2012, 7, 8), :entries => 14)
       FactoryGirl.create(:artefact, slug: "/bar")
 
       engagement = ContentEngagementVisits.last_week_visits
 
       engagement.should have(2).items
+      engagement.map(&:entries).should == [14, 0]
     end
 
     it "should not return artefacts that have been disabled" do
-      engagement = FactoryGirl.create(:content_engagement_visits_with_artefact, slug: "/foo",
-                         start_at: DateTime.new(2012, 7, 1), end_at: DateTime.new(2012, 7, 8))
-      FactoryGirl.create(:content_engagement_visits_with_artefact, slug: "/bar",
-                         start_at: DateTime.new(2012, 7, 1), end_at: DateTime.new(2012, 7, 8))
+      engagement = FactoryGirl.create(:content_engagement_visits_with_artefact, slug: "/foo", format: "policy",
+                                      start_at: DateTime.new(2012, 7, 1), end_at: DateTime.new(2012, 7, 8), entries: 47)
+      FactoryGirl.create(:content_engagement_visits_with_artefact, slug: "/bar", format: "policy",
+                         start_at: DateTime.new(2012, 7, 1), end_at: DateTime.new(2012, 7, 8), entries: 29)
       engagement.artefact.disabled = true
       engagement.artefact.save
 
       engagement = ContentEngagementVisits.last_week_visits
 
       engagement.should have(1).item
+      engagement.map(&:entries).should == [29]
     end
 
     it "should not return news artefacts older than 2 months" do
       Timecop.freeze(DateTime.new(2013, 2, 21)) {
         policy_artefact_older_than_2_months = FactoryGirl.create(
-                                        :content_engagement_visits_with_artefact, slug: "/foo",
-                                        start_at: DateTime.new(2012, 7, 1), end_at: DateTime.new(2012, 7, 8))
+                                        :content_engagement_visits_with_artefact, slug: "/foo", format: "policy",
+                                        start_at: DateTime.new(2012, 7, 1), end_at: DateTime.new(2012, 7, 8), entries: 24)
 
         news_artefact_older_than_2_months =
           FactoryGirl.create(:artefact, :format => "news", :artefact_updated_at => DateTime.new(2012, 12, 1))
@@ -79,20 +85,22 @@ describe ContentEngagementVisits do
 
         engagement = ContentEngagementVisits.last_week_visits
         engagement.should have(2).item
+        engagement.map(&:entries).should == [24, 0]
       }
     end
 
     it "should return policy artefacts older than 2 months" do
       Timecop.freeze(DateTime.new(2013, 2, 21)) {
         policy_artefact_older_than_2_months = FactoryGirl.create(
-          :content_engagement_visits_with_artefact, slug: "/foo",
-          start_at: DateTime.new(2012, 7, 1), end_at: DateTime.new(2013, 1, 15))
+          :content_engagement_visits_with_artefact, slug: "/foo", format: "policy",
+          start_at: DateTime.new(2012, 7, 1), end_at: DateTime.new(2013, 1, 15), entries: 85)
         policy_artefact_older_than_2_months = FactoryGirl.create(
-          :content_engagement_visits_with_artefact, slug: "/foo",
-          start_at: DateTime.new(2012, 7, 1), end_at: DateTime.new(2012, 7, 8))
+          :content_engagement_visits_with_artefact, slug: "/bar", format: "policy",
+          start_at: DateTime.new(2012, 7, 1), end_at: DateTime.new(2012, 7, 8), entries: 50)
 
         engagement = ContentEngagementVisits.last_week_visits
         engagement.should have(2).item
+        engagement.map(&:entries).should == [85, 50]
       }
     end
   end
