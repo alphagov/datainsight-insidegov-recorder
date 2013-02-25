@@ -1,8 +1,8 @@
 source "https://rubygems.org"
-source 'https://gems.gemfury.com/vo6ZrmjBQu5szyywDszE/'
+source 'https://BnrJb6FZyzspBboNJzYZ@gem.fury.io/govuk/'
 
 gem "rake"
-gem "datainsight_recorder", "0.1.0"
+gem "datainsight_recorder", "0.1.1"
 gem "airbrake", "3.1.5"
 
 group :exposer do
