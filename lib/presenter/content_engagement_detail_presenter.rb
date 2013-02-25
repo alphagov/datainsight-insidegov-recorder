@@ -9,8 +9,8 @@ class ContentEngagementDetailPresenter
       {
         :format => each.format,
         :slug => each.slug,
-        :entries => each.entries,
-        :successes => each.successes,
+        :entries => each.entries < SIGNIFICANCE_THRESHOLD ? nil : each.entries,
+        :successes => each.entries < SIGNIFICANCE_THRESHOLD ? nil : each.successes,
         :title => each.artefact.title,
         :url => each.artefact.url,
       }
@@ -18,6 +18,8 @@ class ContentEngagementDetailPresenter
   end
 
   private
+
+  SIGNIFICANCE_THRESHOLD = 1000
 
   def ensure_all_values_match(values, field)
     unique_values = values.map(&field).uniq
