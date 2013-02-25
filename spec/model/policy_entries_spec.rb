@@ -130,7 +130,6 @@ describe "the policy_entries model" do
   describe "policy join" do
     before(:each) do
       FactoryGirl.create :policy_entries, slug: "/my-slug"
-      FactoryGirl.create :artefact, slug: "/my-slug"
     end
 
     it "should return the joined policy" do

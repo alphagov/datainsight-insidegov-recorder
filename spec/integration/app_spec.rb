@@ -118,7 +118,7 @@ describe "The api layer" do
                          artefact_updated_at: DateTime.parse("2012-12-19T02:00:00+00:00"),
                          collected_at: DateTime.parse("2012-12-20T02:00:00+00:00")
 
-      FactoryGirl.create :policy_entries,
+      FactoryGirl.create :policy_entries_without_policy,
                          entries: 123000,
                          slug: "sample-policy",
                          collected_at: DateTime.parse("2012-12-20T01:00:00+00:00")

@@ -5,8 +5,8 @@ class ContentEngagementVisits
   include DataInsight::Recorder::BaseFields
   include DataInsight::Recorder::TimeSeries
 
-  property :format, String, required: true
-  property :slug, Text, lazy: false, required: true
+  property :format, String, required: true, :unique_index => :slug_and_format_idx
+  property :slug, String, length: 255, required: true, :unique_index => :slug_and_format_idx
   property :entries, Integer, required: true
   property :successes, Integer, required: true
 

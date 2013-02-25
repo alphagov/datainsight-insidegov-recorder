@@ -4,7 +4,9 @@ require "dm-migrations/migration_runner"
 migration 1, :update_policy_model do
   up do
     modify_table :policies do
-      change_column :department, "TEXT", allow_nil: false
+      if adapter.field_exists?("policies", "department")
+        change_column :department, "TEXT", allow_nil: false
+      end
 
       unless adapter.field_exists?("policies", "organisations")
         add_column :organisations, "TEXT", allow_nil: false

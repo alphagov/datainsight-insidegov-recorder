@@ -2,7 +2,16 @@ require_relative "../../lib/datamapper_config"
 require_relative "../../lib/model/policy_entries"
 
 FactoryGirl.define do
-  factory :policy_entries do
+  factory :policy_entries, :parent => :policy_entries_without_policy do
+    after(:build) do |policy_entries, evaluator|
+      if policy_entries.policy.nil?
+        policy_entries.policy =
+                        FactoryGirl.create(:artefact, :slug => policy_entries.slug, :format => "policy")
+      end
+    end
+  end
+
+  factory :policy_entries_without_policy, :class => PolicyEntries do
     sequence(:entries) { |n| n*100000 }
     sequence(:slug) { |n| "/slug-#{n}"}
     sequence(:source) { |n| "source #{n}" }
@@ -10,7 +19,5 @@ FactoryGirl.define do
 
     start_at DateTime.parse("2012-08-06")
     end_at DateTime.parse("2012-08-13")
-
-    association :policy, factory: :artefact
   end
 end

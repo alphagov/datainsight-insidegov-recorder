@@ -5,8 +5,8 @@ class Artefact
   include DataMapper::Resource
   include DataInsight::Recorder::BaseFields
 
-  property :format, String, required: true
-  property :slug, String, length: 255, required: true
+  property :format, String, required: true, :unique_index => :slug_and_format_idx
+  property :slug, String, length: 255, required: true, :unique_index => :slug_and_format_idx
   property :title, String, length: 255, required: true
   property :url, String, length: 255, required: true
   property :organisations, Text, lazy: false, required: true
