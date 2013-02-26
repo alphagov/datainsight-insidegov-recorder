@@ -15,7 +15,7 @@ class ContentEngagementVisits
 
   attr_reader :artefact
 
-  def self.last_week_visits
+  def self.last_week_visits(formats=nil)
     results = repository(:default).adapter.select(
       "select
         c.entries, c.successes, c.start_at, c.end_at, c.collected_at, c.source,
@@ -33,8 +33,10 @@ class ContentEngagementVisits
 
     start_at = results.map { |each| each.start_at }.compact.first
     end_at = results.map { |each| each.end_at }.compact.first
-    
-    results.map { |each|
+
+    results
+    .select { |each| formats.nil? ? true : formats.include?(each.format) }
+    .map { |each|
       ContentEngagementVisits.new(
         :format => each.format,
         :slug => each.slug,

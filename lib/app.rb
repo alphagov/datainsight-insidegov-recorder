@@ -17,6 +17,8 @@ helpers Datainsight::Logging::Helpers
 use Airbrake::Rack
 enable :raise_errors
 
+SUPPORTED_FORMATS = %w(news policy)
+
 configure do
   enable :logging
   unless test?
@@ -58,7 +60,7 @@ get "/format-success/weekly" do
 end
 
 get "/content-engagement-detail/weekly" do
-  content_engagement_visits = ContentEngagementVisits.last_week_visits
+  content_engagement_visits = ContentEngagementVisits.last_week_visits(SUPPORTED_FORMATS)
   return 500 if content_engagement_visits.empty?
 
   response = ContentEngagementDetailPresenter.new.present(content_engagement_visits)

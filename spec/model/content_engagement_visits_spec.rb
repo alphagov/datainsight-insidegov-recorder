@@ -107,6 +107,22 @@ describe ContentEngagementVisits do
         engagement.map(&:entries).should == [85, 50]
       }
     end
+
+    it "should only return supported formats" do
+      Timecop.freeze(DateTime.new(2013, 2, 21)) {
+        FactoryGirl.create(
+          :content_engagement_visits_with_artefact, slug: "/foo", format: "policy",
+          start_at: DateTime.new(2012, 7, 1), end_at: DateTime.new(2013, 1, 15), entries: 85)
+        FactoryGirl.create(
+          :content_engagement_visits_with_artefact, slug: "/bar", format: "speech",
+          start_at: DateTime.new(2012, 7, 1), end_at: DateTime.new(2013, 1, 15), entries: 50)
+
+        engagement = ContentEngagementVisits.last_week_visits(%w(policy))
+        engagement.should have(1).item
+        engagement.first.format.should == "policy"
+        engagement.map(&:entries).should == [85]
+      }
+    end
   end
 
   describe "update_from_message" do
