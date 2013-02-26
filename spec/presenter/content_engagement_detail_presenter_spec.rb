@@ -87,19 +87,21 @@ describe ContentEngagementDetailPresenter do
 
   it "should return entries and successes as nil if entries are less than significance threshold (1000)" do
     list_of_content_engagement_visits = [
-      FactoryGirl.create(:content_engagement_visits_with_artefact, :slug => "foo",
+      FactoryGirl.create(:content_engagement_visits_with_artefact, :slug => "foo", :format => "policy",
                          :entries => 999, :successes => 999),
-      FactoryGirl.create(:content_engagement_visits_with_artefact, :slug => "bar",
+      FactoryGirl.create(:content_engagement_visits_with_artefact, :slug => "bar", :format => "policy",
                          :entries => 2000, :successes => 50)
     ]
 
     response = ContentEngagementDetailPresenter.new.present(list_of_content_engagement_visits)
 
     response[:details][:data].first[:slug].should == "foo"
+    response[:details][:data].first[:format].should == "policy"
     response[:details][:data].first[:entries].should == nil
     response[:details][:data].first[:successes].should == nil
 
     response[:details][:data][1][:slug].should == "bar"
+    response[:details][:data][1][:format].should == "policy"
     response[:details][:data][1][:entries].should == 2000
     response[:details][:data][1][:successes].should == 50
   end

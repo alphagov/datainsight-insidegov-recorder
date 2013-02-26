@@ -17,7 +17,10 @@ class ContentEngagementVisits
 
   def self.last_week_visits
     results = repository(:default).adapter.select(
-      "select * from content_engagement_visits c
+      "select
+        c.entries, c.successes, c.start_at, c.end_at, c.collected_at, c.source,
+        a.format, a.slug, a.title, a.url, a.organisations, a.artefact_updated_at, a.disabled
+       from content_engagement_visits c
        right join artefacts a
        on (c.slug = a.slug
          and c.format = a.format

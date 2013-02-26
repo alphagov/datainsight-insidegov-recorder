@@ -50,11 +50,15 @@ describe ContentEngagementVisits do
     it "should return artefacts even if they do not have matching engagement" do
       FactoryGirl.create(:content_engagement_visits_with_artefact, slug: "/foo", format: "policy",
                          start_at: DateTime.new(2012, 7, 1), end_at: DateTime.new(2012, 7, 8), :entries => 14)
-      FactoryGirl.create(:artefact, slug: "/bar")
+      FactoryGirl.create(:artefact, slug: "/bar", format: "policy")
 
       engagement = ContentEngagementVisits.last_week_visits
 
       engagement.should have(2).items
+      engagement.first.slug.should == "/foo"
+      engagement.first.format.should == "policy"
+      engagement[1].slug.should == "/bar"
+      engagement[1].format.should == "policy"
       engagement.map(&:entries).should == [14, 0]
     end
 
