@@ -27,9 +27,10 @@ class ContentEngagementVisits
          and c.start_at = (select max(start_at) from content_engagement_visits))
        where (
         a.disabled = false
+        and a.collected_at >= ?
         and (a.format != 'news'
           or a.format = 'news' and (c.entries > 1000 or a.artefact_updated_at > ?)))",
-      (DateTime.now << 2))
+      day_of_last_collection, (DateTime.now << 2))
 
     start_at = results.map { |each| each.start_at }.compact.first
     end_at = results.map { |each| each.end_at }.compact.first
@@ -61,6 +62,11 @@ class ContentEngagementVisits
             ))
       }
     }
+  end
+
+  def self.day_of_last_collection
+    last_artefact_collected_at = Artefact.max(:collected_at)
+    last_artefact_collected_at.to_date unless last_artefact_collected_at.nil?
   end
 
   def self.update_from_message(message)
