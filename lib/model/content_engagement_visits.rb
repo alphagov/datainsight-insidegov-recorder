@@ -15,21 +15,37 @@ class ContentEngagementVisits
 
   attr_reader :artefact
 
-  def self.last_week_visits(formats=nil)
-    results = repository(:default).adapter.select(
-      "select
-        c.entries, c.successes, c.start_at, c.end_at, c.collected_at, c.source,
-        a.format, a.slug, a.title, a.url, a.organisations, a.artefact_updated_at, a.disabled
-       from content_engagement_visits c
-       right join artefacts a
-       on (c.slug = a.slug
-         and c.format = a.format
-         and c.start_at = (select max(start_at) from content_engagement_visits))
-       where (
+  SELECT_LAST_WEEK_VISITS = <<-HERE
+    select
+      c.entries,
+      c.successes,
+      c.start_at,
+      c.end_at,
+      c.collected_at,
+      c.source,
+      a.format,
+      a.slug,
+      a.title,
+      a.url,
+      a.organisations,
+      a.artefact_updated_at,
+      a.disabled
+    from
+      content_engagement_visits c
+      right join artefacts a on (
+        c.slug = a.slug
+        and c.format = a.format
+        and c.start_at = (select max(start_at) from content_engagement_visits))
+      where (
         a.disabled = false
-        and (a.format != 'news'
-          or a.format = 'news' and (c.entries > 1000 or a.artefact_updated_at > ?)))",
-      (DateTime.now << 2))
+        and a.collected_at >= ?
+        and (
+          a.format != 'news'
+          or a.format = 'news' and (c.entries > 1000 or a.artefact_updated_at > ?)))
+  HERE
+
+  def self.last_week_visits(formats=nil)
+    results = repository(:default).adapter.select(SELECT_LAST_WEEK_VISITS, day_of_last_collection, (DateTime.now << 2))
 
     start_at = results.map { |each| each.start_at }.compact.first
     end_at = results.map { |each| each.end_at }.compact.first
@@ -61,6 +77,11 @@ class ContentEngagementVisits
             ))
       }
     }
+  end
+
+  def self.day_of_last_collection
+    last_artefact_collected_at = Artefact.max(:collected_at)
+    last_artefact_collected_at.to_date unless last_artefact_collected_at.nil?
   end
 
   def self.update_from_message(message)
