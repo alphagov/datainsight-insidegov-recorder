@@ -123,6 +123,24 @@ describe ContentEngagementVisits do
         engagement.map(&:entries).should == [85]
       }
     end
+
+    it "should return only data for artefacts existing at the time of the last collection" do
+      Timecop.freeze(DateTime.new(2013, 2, 21)) {
+        existing_artefact_1 = FactoryGirl.create(:artefact, slug: "huey",  collected_at: DateTime.new(2013, 2, 20, 2, 10, 4))
+        existing_artefact_2 = FactoryGirl.create(:artefact, slug: "dewey", collected_at: DateTime.new(2013, 2, 20, 2, 10, 7))
+        deleted_artefact =    FactoryGirl.create(:artefact, slug: "louie", collected_at: DateTime.new(2013, 2, 19, 2, 10, 7))
+
+        FactoryGirl.create(:content_engagement_visits, slug: existing_artefact_1.slug, artefact: existing_artefact_1, start_at: DateTime.new(2013, 2, 10), end_at: DateTime.new(2013, 2, 17))
+        FactoryGirl.create(:content_engagement_visits, slug: existing_artefact_2.slug, artefact: existing_artefact_2, start_at: DateTime.new(2013, 2, 10), end_at: DateTime.new(2013, 2, 17))
+        FactoryGirl.create(:content_engagement_visits, slug: deleted_artefact.slug,    artefact: deleted_artefact,    start_at: DateTime.new(2013, 2, 10), end_at: DateTime.new(2013, 2, 17))
+
+        content_engagement_visits = ContentEngagementVisits.last_week_visits
+
+        content_engagement_visits.find {|visits| visits.slug == "huey" }.should_not be_nil
+        content_engagement_visits.find {|visits| visits.slug == "dewey"}.should_not be_nil
+        content_engagement_visits.find {|visits| visits.slug == "louie"}.should be_nil
+      }
+    end
   end
 
   describe "update_from_message" do
