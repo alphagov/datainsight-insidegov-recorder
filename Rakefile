@@ -18,34 +18,6 @@ task :init_data_mapper do
 end
 
 namespace :db do
-  namespace :migrate do
-    desc "Run all pending migrations, or up to specified migration"
-    task :up, [:version] => :load_migrations do |t, args|
-      if version = args[:version] || ENV['VERSION']
-        migrate_up!(version)
-      else
-        migrate_up!
-      end
-    end
-
-    desc "Roll back all migrations, or down to specified migration"
-    task :down, [:version] => :load_migrations do |t, args|
-      if version = args[:version] || ENV['VERSION']
-        migrate_down!(version)
-      else
-        migrate_down!
-      end
-    end
-  end
-  task :migrate => "migrate:up"
-
-  task :load_migrations => :init_data_mapper do
-    require 'dm-migrations/migration_runner'
-    FileList['db/migrate/*.rb'].each do |migration|
-      load migration
-    end
-  end
-
   desc "Disable policy by slug"
   task :disable_policy, [:slug] => :init_data_mapper do |t, args|
     policy = Artefact.first(slug: args[:slug], format: "policy")
@@ -54,3 +26,4 @@ namespace :db do
   end
 end
 
+require "datainsight_recorder/rake_tasks"
