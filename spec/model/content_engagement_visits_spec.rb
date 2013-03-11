@@ -138,17 +138,20 @@ describe ContentEngagementVisits do
 
     it "should return only data for artefacts existing at the time of the last collection" do
       Timecop.freeze(DateTime.new(2013, 2, 21)) {
-        existing_artefact_1 = FactoryGirl.create(:artefact, slug: "huey",  collected_at: DateTime.new(2013, 2, 20, 2, 10, 4))
-        existing_artefact_2 = FactoryGirl.create(:artefact, slug: "dewey", collected_at: DateTime.new(2013, 2, 20, 2, 10, 7))
-        deleted_artefact =    FactoryGirl.create(:artefact, slug: "louie", collected_at: DateTime.new(2013, 2, 19, 2, 10, 7))
+        existing_policy = FactoryGirl.create(:artefact, slug: "donald",  format: "policy", collected_at: DateTime.new(2013, 2, 20, 2, 10, 4))
+        deleted_policy =  FactoryGirl.create(:artefact, slug: "huey", format: "policy", collected_at: DateTime.new(2013, 2, 19, 2, 10, 7))
+        existing_news = FactoryGirl.create(:artefact, slug: "dewey",  format: "news", collected_at: DateTime.new(2013, 2, 20, 2, 10, 4))
+        deleted_news  = FactoryGirl.create(:artefact, slug: "louie", format: "news", collected_at: DateTime.new(2013, 2, 19, 2, 10, 7))
 
-        FactoryGirl.create(:content_engagement_visits, slug: existing_artefact_1.slug, artefact: existing_artefact_1, start_at: DateTime.new(2013, 2, 10), end_at: DateTime.new(2013, 2, 17))
-        FactoryGirl.create(:content_engagement_visits, slug: existing_artefact_2.slug, artefact: existing_artefact_2, start_at: DateTime.new(2013, 2, 10), end_at: DateTime.new(2013, 2, 17))
-        FactoryGirl.create(:content_engagement_visits, slug: deleted_artefact.slug,    artefact: deleted_artefact,    start_at: DateTime.new(2013, 2, 10), end_at: DateTime.new(2013, 2, 17))
+        FactoryGirl.create(:content_engagement_visits, slug: existing_policy.slug, format: "policy", start_at: DateTime.new(2013, 2, 10), end_at: DateTime.new(2013, 2, 17), entries: 1500)
+        FactoryGirl.create(:content_engagement_visits, slug: deleted_policy.slug,  format: "policy", start_at: DateTime.new(2013, 2, 10), end_at: DateTime.new(2013, 2, 17), entries: 1500)
+        FactoryGirl.create(:content_engagement_visits, slug: existing_news.slug, format: "news", start_at: DateTime.new(2013, 2, 10), end_at: DateTime.new(2013, 2, 17), entries: 1500)
+        FactoryGirl.create(:content_engagement_visits, slug: deleted_news.slug,  format: "news", start_at: DateTime.new(2013, 2, 10), end_at: DateTime.new(2013, 2, 17), entries: 1500)
 
         content_engagement_visits = ContentEngagementVisits.last_week_visits
 
-        content_engagement_visits.find {|visits| visits.slug == "huey" }.should_not be_nil
+        content_engagement_visits.find {|visits| visits.slug == "donald" }.should_not be_nil
+        content_engagement_visits.find {|visits| visits.slug == "huey"}.should be_nil
         content_engagement_visits.find {|visits| visits.slug == "dewey"}.should_not be_nil
         content_engagement_visits.find {|visits| visits.slug == "louie"}.should be_nil
       }
