@@ -1,3 +1,11 @@
+# Initial Migration
+#
+# DO NOT USE THIS AS A TEMPLATE
+#
+# This is the initial migration after moving away from auto_migrate. It sets
+# up tables that may or may not have already been created by auto_migrate.
+# Do not use this as a template for subsequent migrations.
+#
 require "datainsight_recorder/migrations"
 
 migration 1, :create_initial_schema do
