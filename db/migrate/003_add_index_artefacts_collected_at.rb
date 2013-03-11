@@ -6,6 +6,6 @@ migration 3, :add_index_artefacts_collected_at do
   end
 
   down do
-    execute "alter table artefacts drop index index_artefacts_collected_at"
+    adapter.drop_index "artefacts", "index_artefacts_collected_at"
   end
 end
