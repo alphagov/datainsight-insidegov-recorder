@@ -1,0 +1,8 @@
+development:
+  uri: mysql://root:@localhost/datainsight_insidegov
+
+test:
+  uri: mysql://datainsight:@localhost/datainsight_insidegov_test
+
+production:
+  uri: mysql://datainsight:@localhost/datainsight_insidegov

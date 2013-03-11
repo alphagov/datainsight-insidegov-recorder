@@ -1,4 +1,3 @@
-require_relative "../../lib/datamapper_config"
 require_relative "../../lib/model/weekly_reach"
 
 FactoryGirl.define do

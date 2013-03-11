@@ -11,10 +11,8 @@ unless [ENV["RACK_ENV"], ENV["RAILS_ENV"]].include? "production"
   end
 end
 
-require_relative "lib/datamapper_config"
-
 task :init_data_mapper do
-  DataMapperConfig.configure
+  DataInsight::Recorder::DataMapperConfig.configure
 end
 
 namespace :db do
