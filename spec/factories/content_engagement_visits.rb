@@ -1,6 +1,6 @@
 FactoryGirl.define do
   factory :content_engagement_visits do
-    format "guide"
+    format "policy"
     sequence(:slug) { |n| "/slug-#{n}" }
     entries 10000
     successes 5000

@@ -22,7 +22,7 @@ describe ContentEngagementDetailPresenter do
 
     response = ContentEngagementDetailPresenter.new.present(list_of_content_engagement_visits)
 
-    response[:details][:data].first[:format].should == "guide"
+    response[:details][:data].first[:format].should == "policy"
     response[:details][:data].first[:slug].should == "foo"
     response[:details][:data].first[:entries].should == 10000
     response[:details][:data].first[:successes].should == 5000
