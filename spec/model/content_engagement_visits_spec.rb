@@ -77,19 +77,31 @@ describe ContentEngagementVisits do
     end
 
     it "should not return news artefacts older than 2 months" do
-      Timecop.freeze(DateTime.new(2013, 2, 21)) {
-        policy_artefact_older_than_2_months = FactoryGirl.create(
-                                        :content_engagement_visits_with_artefact, slug: "/foo", format: "policy",
-                                        start_at: DateTime.new(2012, 7, 1), end_at: DateTime.new(2012, 7, 8), entries: 24)
-
+      Timecop.freeze(DateTime.new(2012, 12, 21)) {
         news_artefact_older_than_2_months =
-          FactoryGirl.create(:artefact, :format => "news", :artefact_updated_at => DateTime.new(2012, 12, 1))
+          FactoryGirl.create(:artefact, :format => "news", slug: "old-news", :artefact_updated_at => DateTime.new(2012, 10, 21))
         news_artefact_younger_than_2_months =
-          FactoryGirl.create(:artefact, :format => "news", :artefact_updated_at => DateTime.new(2013, 1, 1))
+          FactoryGirl.create(:artefact, :format => "news", slug: "recent-news", :artefact_updated_at => DateTime.new(2012, 10, 22))
 
         engagement = ContentEngagementVisits.last_week_visits
-        engagement.should have(2).item
-        engagement.map(&:entries).should == [24, 0]
+
+        engagement.should have(1).item
+        engagement[0].slug.should == "recent-news"
+      }
+    end
+
+    it "should return news artefacts older than 2 months with more than 1000 visits" do
+      Timecop.freeze(DateTime.new(2012, 12, 21)) {
+        FactoryGirl.create(:artefact, slug: "old-with-few-visits", format: "news", :artefact_updated_at => DateTime.new(2012, 10, 21))
+        FactoryGirl.create(:content_engagement_visits, slug: "old-with-few-visits", format: "news", entries: 1)
+
+        FactoryGirl.create(:artefact, slug: "old-with-many-visits", format: "news", :artefact_updated_at => DateTime.new(2012, 10, 21))
+        FactoryGirl.create(:content_engagement_visits, slug: "old-with-many-visits", format: "news", entries: 1001)
+
+        engagement = ContentEngagementVisits.last_week_visits
+
+        engagement.should have(1).item
+        engagement[0].slug.should == "old-with-many-visits"
       }
     end
 
