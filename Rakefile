@@ -11,13 +11,9 @@ unless [ENV["RACK_ENV"], ENV["RAILS_ENV"]].include? "production"
   end
 end
 
-task :init_data_mapper do
-  DataInsight::Recorder::DataMapperConfig.configure
-end
-
 namespace :db do
   desc "Disable policy by slug"
-  task :disable_policy, [:slug] => :init_data_mapper do |t, args|
+  task :disable_policy, [:slug] => "db:configure" do |t, args|
     policy = Artefact.first(slug: args[:slug], format: "policy")
     fail("No policy with slug: #{args[:slug]}") if policy.nil?
     policy.update(disabled: true)
