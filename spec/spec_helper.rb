@@ -9,7 +9,9 @@ end
 
 ENV["RACK_ENV"] = "test"
 require "factory_girl"
-require_relative "../lib/datamapper_config"
+require "datainsight_logging"
+require "datainsight_recorder/datamapper_config"
+
 require_relative "../lib/model/weekly_reach"
 require_relative "../lib/model/format_visits"
 require_relative "../lib/model/content_engagement_visits"
@@ -20,7 +22,7 @@ FactoryGirl.find_definitions
 Datainsight::Logging.configure(:env => :test)
 ::Logging.logger.root.level = :warn
 
-DataMapperConfig.configure(:test)
+DataInsight::Recorder::DataMapperConfig.configure(:test)
 
 RSpec.configure do |config|
   config.before(:each) do
