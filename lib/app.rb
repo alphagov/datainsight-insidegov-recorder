@@ -1,6 +1,9 @@
 require "bundler/setup"
 Bundler.require(:default, :exposer)
 
+require "datainsight_logging"
+require "datainsight_recorder/datamapper_config"
+
 require_relative "model/weekly_reach"
 require_relative "model/policy_entries"
 require_relative "model/format_visits"
@@ -9,7 +12,6 @@ require_relative "presenter/date_series_presenter"
 require_relative "presenter/content_engagement_presenter"
 require_relative "presenter/content_engagement_detail_presenter"
 require_relative "presenter/policy_presenter"
-require_relative "datamapper_config"
 require_relative "initializers"
 
 helpers Datainsight::Logging::Helpers
@@ -23,7 +25,7 @@ configure do
   enable :logging
   unless test?
     Datainsight::Logging.configure(:type => :exposer)
-    DataMapperConfig.configure
+    DataInsight::Recorder::DataMapperConfig.configure
   end
 end
 
