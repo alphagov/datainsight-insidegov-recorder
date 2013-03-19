@@ -35,10 +35,10 @@ describe ContentEngagementDetailPresenter do
 
     response = ContentEngagementDetailPresenter.new.present(list_of_content_engagement_visits)
 
-    response[:details][:start_at].should == "2013-01-13T00:00:00+00:00"
-    response[:details][:end_at].should == "2013-01-20T00:00:00+00:00"
+    response[:details][:start_at].should == "2013-01-13T00:00:00"
+    response[:details][:end_at].should == "2013-01-20T00:00:00"
     response[:details][:source].should == ["Google Analytics"]
-    response[:updated_at].should == "2013-01-21T00:00:00+00:00"
+    response[:updated_at].should == "2013-01-21T00:00:00"
   end
 
   it "should normally mark response as ok" do

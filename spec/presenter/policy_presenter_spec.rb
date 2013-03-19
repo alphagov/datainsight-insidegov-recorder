@@ -91,11 +91,11 @@ describe PolicyPresenter do
     it "should have an updated_at for each data item" do
       response = @presenter.present(@policies)
 
-      response[:details][:data].map {|item| item[:policy][:updated_at] }.should == [
-        DateTime.new(2012, 12, 12, 12, 12, 12),
-        DateTime.new(2012, 12, 13, 12, 12, 12),
-        DateTime.new(2012, 12, 14, 12, 12, 12)
-      ]
+      response[:details][:data].map {|item| item[:policy][:updated_at] }.should == %w(
+        2012-12-12T12:12:12
+        2012-12-13T12:12:12
+        2012-12-14T12:12:12
+      )
     end
 
     it "should have the organisations for each data item" do

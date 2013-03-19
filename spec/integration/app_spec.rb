@@ -22,7 +22,7 @@ describe "The api layer" do
 
         last_response.content_type.should start_with("application/json")
         json_response = JSON.parse(last_response.body, symbolize_names: true)
-        json_response[:updated_at].should == data_collection_date.strftime
+        json_response[:updated_at].should == "2012-12-13T00:00:00"
         json_response[:response_info].should == {status: "ok"}
         json_response[:details][:data].length.should == 26
         json_response[:details][:source].should == ["Google Analytics"]
@@ -46,7 +46,7 @@ describe "The api layer" do
 
         last_response.content_type.should start_with("application/json")
         json_response = JSON.parse(last_response.body, symbolize_names: true)
-        json_response[:updated_at].should == data_collection_date.strftime
+        json_response[:updated_at].should == "2012-12-13T00:00:00"
         json_response[:response_info].should == {status: "ok"}
         json_response[:details][:data].length.should == 12
         json_response[:details][:source].should == ["Google Analytics"]
@@ -88,7 +88,7 @@ describe "The api layer" do
 
         last_response.content_type.should start_with("application/json")
         json_response = JSON.parse(last_response.body, symbolize_names: true)
-        json_response[:updated_at].should == data_collection_date.strftime
+        json_response[:updated_at].should == "2012-12-13T00:00:00"
         json_response[:response_info].should == {status: "ok"}
         json_response[:details][:data].length.should == 12
         json_response[:details][:source].should == ["Google Analytics"]
@@ -130,11 +130,11 @@ describe "The api layer" do
 
       json_response = JSON.parse(last_response.body, symbolize_names: true)
       json_response[:response_info].should == {status: "ok"}
-      json_response[:updated_at].should == "2012-12-20T01:00:00+00:00"
+      json_response[:updated_at].should == "2012-12-20T01:00:00"
 
       details = json_response[:details]
-      details[:start_at].should == "2012-08-06T00:00:00+00:00"
-      details[:end_at].should == "2012-08-13T00:00:00+00:00"
+      details[:start_at].should == "2012-08-06T00:00:00"
+      details[:end_at].should == "2012-08-13T00:00:00"
 
       data = details[:data]
       data.should be_an_instance_of(Array)
@@ -143,7 +143,7 @@ describe "The api layer" do
       data[0][:policy][:web_url].should == "https://www.gov.uk/government/policies/sample-policy"
       data[0][:policy][:title].should == "Sample Policy"
       data[0][:policy][:organisations].should == [{abbreviation: "MOD", name: "Ministry of defence"}]
-      data[0][:policy][:updated_at].should == "2012-12-19T02:00:00+00:00"
+      data[0][:policy][:updated_at].should == "2012-12-19T02:00:00"
     end
 
     it "should return a 500 if there is no joined policy" do
@@ -176,36 +176,38 @@ describe "The api layer" do
     end
 
     it "should return the TOP ten policies for last week" do
-      last_sunday = DateUtils.sunday_before(DateTime.now)
-      15.times do |n|
-        params = {
-          entries: (n+2) * 1000,
-          start_at: last_sunday - 14,
-          end_at: last_sunday - 7
-        }
-        FactoryGirl.create :policy_entries, params
+      Timecop.freeze(DateTime.parse("2012-12-12")) do
+        last_sunday = DateUtils.sunday_before(DateTime.now)
+        15.times do |n|
+          params = {
+            entries: (n+2) * 1000,
+            start_at: last_sunday - 14,
+            end_at: last_sunday - 7
+          }
+          FactoryGirl.create :policy_entries, params
+        end
+        15.times do |n|
+          params = {
+            entries: (n+1) * 1000,
+            start_at: last_sunday - 7,
+            end_at: last_sunday
+          }
+          FactoryGirl.create :policy_entries, params
+        end
+
+        get "/entries/weekly/policies"
+
+        json_response = JSON.parse(last_response.body, symbolize_names: true)
+        details = json_response[:details]
+        result = details[:data]
+
+        details[:start_at].should == "2012-12-02T00:00:00"
+        details[:end_at].should == "2012-12-09T00:00:00"
+
+        result.should have(10).items
+        result.first[:entries].should == 15000
+        result.last[:entries].should == 6000
       end
-      15.times do |n|
-        params = {
-          entries: (n+1) * 1000,
-          start_at: last_sunday - 7,
-          end_at: last_sunday
-        }
-        FactoryGirl.create :policy_entries, params
-      end
-
-      get "/entries/weekly/policies"
-
-      json_response = JSON.parse(last_response.body, symbolize_names: true)
-      details = json_response[:details]
-      result = details[:data]
-
-      details[:start_at].should == (last_sunday - 7).strftime
-      details[:end_at].should == last_sunday.strftime
-
-      result.should have(10).items
-      result.first[:entries].should == 15000
-      result.last[:entries].should == 6000
     end
 
     it "should error if there are not ten policies to return" do
@@ -232,7 +234,7 @@ describe "The api layer" do
 
       resource[:response_info][:status].should == "ok"
       resource[:details][:source].should == ["format-data-source"]
-      resource[:updated_at].should == "2012-10-03T13:00:00+00:00"
+      resource[:updated_at].should == "2012-10-03T13:00:00"
       resource[:details][:data].should have(2).item
       resource[:details][:data][0][:format].should == "news"
       resource[:details][:data][0][:entries].should == 1000

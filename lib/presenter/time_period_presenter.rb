@@ -1,4 +1,6 @@
 class TimePeriodPresenter
+  TIMESTAMP_FORMAT="%Y-%m-%dT%H:%M:%S"
+
   def start_at(data)
     data.first.start_at
   end
@@ -24,12 +26,12 @@ class TimePeriodPresenter
     {
       response_info: {status: "ok"},
       details: {
-        start_at:   start_at(data).strftime,
-        end_at:     end_at(data).strftime,
+        start_at:   start_at(data).strftime(TIMESTAMP_FORMAT),
+        end_at:     end_at(data).strftime(TIMESTAMP_FORMAT),
         source:     sources(data),
         data:       inner_data
       },
-      updated_at: updated_at(data).strftime
+      updated_at: updated_at(data).strftime(TIMESTAMP_FORMAT)
     }
   end
 end

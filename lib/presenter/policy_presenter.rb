@@ -8,7 +8,7 @@ class PolicyPresenter
         policy: {
           title: policy_entry.policy.title,
           web_url: "https://www.gov.uk/government/policies/#{policy_entry.slug}",
-          updated_at: policy_entry.policy.artefact_updated_at,
+          updated_at: policy_entry.policy.artefact_updated_at.strftime(TimePeriodPresenter::TIMESTAMP_FORMAT),
           organisations: JSON.parse(policy_entry.policy.organisations)
         }
       }
