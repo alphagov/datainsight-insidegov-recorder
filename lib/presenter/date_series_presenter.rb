@@ -57,10 +57,14 @@ class DateSeriesPresenter
     Response.new(response)
   end
 
+  def midnight?(datetime)
+    datetime.hour == 0 && datetime.minute == 0 && datetime.second == 0 && datetime.second_fraction == 0
+  end
+
   def add_missing_datapoints(time_series_data)
     lookup = Hash[time_series_data.map { |item| [item.start_at, item] }]
     start_at = time_series_data.map(&:start_at).min
-    if start_at != start_at.to_date
+    if !midnight?(start_at)
       raise "Periods must start at midnight; received #{start_at}."
     end
     (start_at..end_date_for(Date.today)).step(@days_to_step).reject { |start_at|
@@ -79,7 +83,7 @@ class DateSeriesPresenter
 
   private
   def validate_period(start_at, end_at)
-    if (end_at - start_at) != @days_to_step
+    if (end_at.to_date - start_at.to_date) != @days_to_step
       raise "Invalid period, expecting #{@days_to_step} days difference,
             but period was: #{{start_at: start_at, end_at: end_at}}"
     end
