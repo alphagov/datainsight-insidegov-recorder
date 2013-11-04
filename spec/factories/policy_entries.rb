@@ -16,7 +16,7 @@ FactoryGirl.define do
     sequence(:source) { |n| "source #{n}" }
     sequence(:collected_at) { |n| DateTime.parse("2012-11-19T00:#{"%02d" % (n%60)}:00+00:00") }
 
-    start_at DateTime.parse("2012-08-06")
-    end_at DateTime.parse("2012-08-13")
+    start_at DateTime.parse("2012-08-06T00:00:00+01:00")
+    end_at DateTime.parse("2012-08-13T00:00:00+01:00")
   end
 end
