@@ -234,7 +234,7 @@ describe "The api layer" do
 
       resource[:response_info][:status].should == "ok"
       resource[:details][:source].should == ["format-data-source"]
-      resource[:updated_at].should == "2012-10-03T13:00:00"
+      resource[:updated_at].should == "2012-10-03T14:00:00"
       resource[:details][:data].should have(2).item
       resource[:details][:data][0][:format].should == "news"
       resource[:details][:data][0][:entries].should == 1000

@@ -16,8 +16,8 @@ describe "The weekly reach model" do
           :_routing_key => "google_analytics.inside_gov.visitors.weekly"
         },
         :payload => {
-          :start_at => "2011-03-28T00:00:00",
-          :end_at => "2011-04-04T00:00:00",
+          :start_at => "2011-03-28T00:00:00+01:00",
+          :end_at => "2011-04-04T00:00:00+01:00",
           :value => {
             :visitors => 700,
             :site => "insidegov"
@@ -33,8 +33,8 @@ describe "The weekly reach model" do
       item = WeeklyReach.first
       item.metric.should == "visitors"
       item.value.should == 700
-      item.start_at.should == DateTime.new(2011, 3, 28)
-      item.end_at.should == DateTime.new(2011, 4, 4)
+      item.start_at.should == DateTime.parse("2011-03-28T00:00:00+01:00")
+      item.end_at.should == DateTime.parse("2011-04-04T00:00:00+01:00")
     end
 
     it "should store weekly data when processing analytics message" do
@@ -45,8 +45,8 @@ describe "The weekly reach model" do
       item = WeeklyReach.first
       item.metric.should == "visitors"
       item.value.should == 700
-      item.start_at.should == DateTime.new(2011, 3, 28)
-      item.end_at.should == DateTime.new(2011, 4, 4)
+      item.start_at.should == DateTime.parse("2011-03-28T00:00:00+01:00")
+      item.end_at.should == DateTime.parse("2011-04-04T00:00:00+01:00")
     end
 
     it "should store visitors metric" do
