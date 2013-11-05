@@ -110,8 +110,8 @@ describe "The weekly reach model" do
       Timecop.travel(DateTime.parse("2012-12-04")) do
         data = WeeklyReach.last_twelve_weeks
 
-        data.first[:start_at].should == DateTime.parse("2012-09-09")
-        data.last[:start_at].should == DateTime.parse("2012-11-18")
+        data.first[:start_at].should == DateUtils.localise(DateTime.parse("2012-09-09"))
+        data.last[:start_at].should == DateUtils.localise(DateTime.parse("2012-11-18"))
       end
     end
   end
@@ -125,8 +125,8 @@ describe "The weekly reach model" do
       Timecop.travel(DateTime.parse("2012-12-04")) do
         data = WeeklyReach.last_six_months
 
-        data.first[:start_at].should == DateTime.parse("2012-06-03")
-        data.last[:start_at].should == DateTime.parse("2012-11-18")
+        data.first[:start_at].should == DateUtils.localise(DateTime.parse("2012-06-03"))
+        data.last[:start_at].should == DateUtils.localise(DateTime.parse("2012-11-18"))
       end
     end
   end

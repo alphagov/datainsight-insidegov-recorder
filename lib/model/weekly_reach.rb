@@ -53,13 +53,13 @@ class WeeklyReach
   def self.last_twelve_weeks
     _12_weeks = (12 * 7)
     WeeklyReach.all(
-      :start_at.gte => DateUtils.last_sunday_for(DateTime.now - _12_weeks)
+      :start_at.gte => DateUtils.localise(DateUtils.last_sunday_for(DateTime.now - _12_weeks))
     )
   end
 
   def self.last_six_months
     WeeklyReach.all(
-      :start_at.gte => DateUtils.last_sunday_for(DateTime.now << 6)
+      :start_at.gte => DateUtils.localise(DateUtils.last_sunday_for(DateTime.now << 6))
     )
   end
 

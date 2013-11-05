@@ -117,22 +117,21 @@ describe DateSeriesPresenter do
         end
       end
 
-      it "should fail if the time period is out by an hour" do
+      it "should fail if start time is not midnight" do
         visitors = [
           FactoryGirl.build(:model,
-                            start_at: DateTime.parse("2011-03-28T00:00:00"),
-                            end_at: DateTime.parse("2011-04-04T01:00:00")
-          )
-        ]
+                            start_at: DateTime.parse("2011-03-28T01:00:00"),
+                            end_at: DateTime.parse("2011-04-04T00:00:00")
+          )]
         Timecop.travel(DateTime.parse("2011-04-24")) do
           lambda { @presenter.add_missing_datapoints(visitors) }.should raise_error
         end
       end
 
-      it "should fail if start time is not midnight" do
+      it "should fail if the end time is not midnight" do
         visitors = [
           FactoryGirl.build(:model,
-                            start_at: DateTime.parse("2011-03-28T01:00:00"),
+                            start_at: DateTime.parse("2011-03-28T00:00:00"),
                             end_at: DateTime.parse("2011-04-04T01:00:00")
           )]
         Timecop.travel(DateTime.parse("2011-04-24")) do

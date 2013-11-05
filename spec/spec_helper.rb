@@ -30,12 +30,13 @@ RSpec.configure do |config|
   end
 end
 
-
 def create_measurements(start_at, end_at, params={})
+  start_at = start_at.to_datetime
+  end_at = end_at.to_datetime
   while start_at < end_at
     each_end_at = start_at + 7
-    params[:start_at] = start_at
-    params[:end_at] = each_end_at
+    params[:start_at] = DateUtils.localise(start_at)
+    params[:end_at] = DateUtils.localise(each_end_at)
     FactoryGirl.create(:model, params)
 
     start_at += 7
