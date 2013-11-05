@@ -1,0 +1,2 @@
+test:
+  uri: mysql://root:@localhost/datainsight_insidegov_test
