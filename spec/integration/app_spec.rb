@@ -24,12 +24,15 @@ describe "The api layer" do
         json_response = JSON.parse(last_response.body, symbolize_names: true)
         json_response[:updated_at].should == "2012-12-13T00:00:00"
         json_response[:response_info].should == {status: "ok"}
-        json_response[:details][:data].length.should == 26
+        json_response[:details][:data].length.should ==
+            26
         json_response[:details][:source].should == ["Google Analytics"]
 
         data = json_response[:details][:data]
         data.first[:start_at].should == "2012-06-10" # sunday 6 months before today
         data.first[:value].should == 500
+        data.last[:end_at].should == "2012-12-08"
+        data.last[:value].should == 500
       end
     end
 
