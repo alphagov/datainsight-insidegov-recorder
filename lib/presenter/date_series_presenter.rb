@@ -58,13 +58,15 @@ class DateSeriesPresenter
   end
 
   def add_missing_datapoints(time_series_data)
-    lookup = Hash[time_series_data.map { |item| [item.start_at, item] }]
-    start_at = time_series_data.map(&:start_at).min
-    validate_midnight(start_at)
-    (start_at..end_date_for(Date.today)).step(@days_to_step).reject { |start_at|
+    lookup = Hash[time_series_data.map { |item| [item.start_at.to_date, item] }]
+    start_at_time = time_series_data.map(&:start_at).min
+    validate_midnight(start_at_time)
+    (start_at_time..end_date_for(Date.today)).step(@days_to_step).reject { |start_at_time|
+      start_at = start_at_time.to_date
       # Do not add null values for the last data point if we're on the same day
       (Date.today == start_at + @days_to_step) and !lookup.has_key?(start_at)
-    }.map do |start_at|
+    }.map do |start_at_time|
+      start_at = start_at_time.to_date
       value = lookup[start_at].value if lookup.has_key?(start_at)
       validate_period(start_at, lookup[start_at].end_at) unless value.nil?
       validate_midnight(lookup[start_at].end_at) unless value.nil?
